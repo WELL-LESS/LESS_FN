@@ -7,7 +7,7 @@
       "type": "dart",
       "program": "lib/main.dart",
       "toolArgs": [
-        "--dart-define-from-file=env/development.json"
+        "--dart-define-from-file=.env/development.json"
       ]
     }
   ]
