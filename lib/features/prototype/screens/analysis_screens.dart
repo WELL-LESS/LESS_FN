@@ -24,6 +24,7 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
 
   int? _draggingIndex;
   double _dragOffset = 0.0;
+  final Set<String> _activeProductNames = {'MISSHA 타임 레볼루션'};
 
   @override
   void initState() {
@@ -125,7 +126,7 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
   Widget _buildItem(int index) {
     final product = _items[index];
     final isDragging = (_draggingIndex == index);
-    final active = product.name.contains('MISSHA');
+    final active = _activeProductNames.contains(product.name);
     final left = index.isEven;
     
     // Staggered values
@@ -148,6 +149,15 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
     final double currentTop = baseTop + (isDragging ? _dragOffset : 0.0);
     
     final card = GestureDetector(
+      onTap: () {
+        setState(() {
+          if (_activeProductNames.contains(product.name)) {
+            _activeProductNames.remove(product.name);
+          } else {
+            _activeProductNames.add(product.name);
+          }
+        });
+      },
       onVerticalDragStart: (details) {
         setState(() {
           _draggingIndex = index;
@@ -489,27 +499,7 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
           ),
           const SizedBox(height: 12),
           
-          // Ingredient comparison Panel
-          if (_comparisonVisible)
-            AnimatedBuilder(
-              animation: _comparisonController,
-              builder: (context, child) {
-                return Opacity(
-                  opacity: _comparisonController.value,
-                  child: Transform.translate(
-                    offset: Offset(0.0, (1.0 - _comparisonController.value) * 8.0),
-                    child: child,
-                  ),
-                );
-              },
-              child: _IngredientComparison(
-                onClose: () {
-                  _comparisonController.reverse().then((_) {
-                    setState(() => _comparisonVisible = false);
-                  });
-                },
-              ),
-            ),
+          // Global comparison panel removed to favor inline card expansion
             
           // Product Card 1
           AnimatedBuilder(
@@ -683,43 +673,51 @@ class _ScoreRingPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: radius);
     const startAngle = -1.5707963267948966;
     final sweepAngle = 6.283185307179586 * progress;
-    final sectorShader = const RadialGradient(
-      center: Alignment(-0.12, -0.08),
-      radius: 0.9,
-      colors: [Color(0xFFFF4338), Color(0xFFF52C29), Color(0xFFD91820)],
-      stops: [0, 0.62, 1],
+    final endAngle = startAngle + (sweepAngle > 0.0 ? sweepAngle : 0.0001);
+    final sectorShader = SweepGradient(
+      center: Alignment.center,
+      startAngle: startAngle,
+      endAngle: endAngle,
+      colors: const [
+        Color(0xFFD91820), // Darker red at the start
+        Color(0xFFFF3B30), // Mid-red
+        Color(0xFFFF9500), // Vibrant orange-yellow at leading tip
+      ],
+      stops: const [0.0, 0.5, 1.0],
     ).createShader(rect);
 
     final track = Paint()..color = const Color(0xFF0E0E0E);
     canvas.drawCircle(center, radius, track);
 
-    final outerGlow = Paint()
-      ..color = const Color(0xFFE51F27).withValues(alpha: 0.55)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
-    canvas.drawArc(rect, startAngle, sweepAngle, true, outerGlow);
+    if (sweepAngle > 0.0) {
+      final outerGlow = Paint()
+        ..color = const Color(0xFFFF5E00).withValues(alpha: 0.6)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+      canvas.drawArc(rect, startAngle, sweepAngle, true, outerGlow);
 
-    final sector = Paint()
-      ..shader = sectorShader
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.4);
-    canvas.drawArc(rect, startAngle, sweepAngle, true, sector);
+      final sector = Paint()
+        ..shader = sectorShader
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.4);
+      canvas.drawArc(rect, startAngle, sweepAngle, true, sector);
 
-    final innerGlow = Paint()
-      ..color = const Color(0xFFFF342E).withValues(alpha: 0.42)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius * 0.88),
-      startAngle,
-      sweepAngle,
-      true,
-      innerGlow,
-    );
+      final innerGlow = Paint()
+        ..color = const Color(0xFFFF342E).withValues(alpha: 0.45)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius * 0.88),
+        startAngle,
+        sweepAngle,
+        true,
+        innerGlow,
+      );
 
-    final edge = Paint()
-      ..color = const Color(0xFFFF4238).withValues(alpha: 0.42)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
-    canvas.drawArc(rect, startAngle, sweepAngle, false, edge);
+      final edge = Paint()
+        ..color = const Color(0xFFFF4238).withValues(alpha: 0.42)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+      canvas.drawArc(rect, startAngle, sweepAngle, false, edge);
+    }
   }
 
   @override
@@ -748,9 +746,23 @@ class _RemoveProductCard extends StatefulWidget {
 
 class _RemoveProductCardState extends State<_RemoveProductCard> {
   double _scale = 1.0;
+  bool _expanded = false;
+
+  @override
+  void didUpdateWidget(covariant _RemoveProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedReplacement != oldWidget.selectedReplacement) {
+      if (widget.selectedReplacement) {
+        _expanded = true;
+      }
+    }
+  }
 
   void _handleTap() {
-    setState(() => _scale = 1.015);
+    setState(() {
+      _expanded = !_expanded;
+      _scale = 1.015;
+    });
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) setState(() => _scale = 1.0);
     });
@@ -969,6 +981,17 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                     ),
                   ],
                 ),
+              ),
+
+              // 7. Inline Comparison Expansion
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOutCubic,
+                child: _expanded
+                    ? _IngredientComparison(
+                        onClose: () => setState(() => _expanded = false),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),

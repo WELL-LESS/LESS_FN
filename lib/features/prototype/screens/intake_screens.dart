@@ -1850,7 +1850,7 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProviderStateMixin {
-  final selected = <String>{'클렌징폼/젤', '미스트/오일'};
+  final selected = <String>{'클렌징젤', '클렌징폼', '오일'};
   double _scrollPosition = 4.0;
   late final AnimationController _snapController;
   Animation<double>? _snapAnimation;
@@ -1942,20 +1942,23 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
 
   List<Widget> _buildCategoryItems() {
     final list = <Widget>[];
-    for (int i = 0; i < _categories.length; i++) {
-      final isLeft = i % 2 == 0;
+    
+    // Left items
+    for (int i = 0; i < _leftCategories.length; i++) {
       final y = (i - _scrollPosition) * 44.0;
-      
       final distance = (i - _scrollPosition).abs();
       final opacity = (1.0 - (distance * 0.36)).clamp(0.0, 1.0);
       if (opacity <= 0.0) continue;
       
       final scale = (1.12 - (distance * 0.12)).clamp(0.78, 1.12);
       
+      final cat = _leftCategories[i];
+      final isSelected = selected.contains(cat);
+      
       Color textColor;
-      if (i == _selectedIndex) {
+      if (isSelected) {
         textColor = WellLessColors.primary;
-      } else if (distance < 1.2) {
+      } else if (i == _selectedIndex) {
         textColor = Colors.white;
       } else {
         textColor = WellLessColors.dim;
@@ -1965,8 +1968,7 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       
       list.add(
         Positioned(
-          left: isLeft ? null : 125.0 + getXOffset(y),
-          right: isLeft ? 125.0 + getXOffset(y) : null,
+          right: 125.0 + getXOffset(y),
           top: 130.0 + y - (18.0 * scale),
           child: Opacity(
             opacity: opacity,
@@ -1974,7 +1976,6 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
               scale: scale,
               child: GestureDetector(
                 onTap: () {
-                  final cat = _categories[i];
                   setState(() {
                     if (selected.contains(cat)) {
                       selected.remove(cat);
@@ -1987,9 +1988,72 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
                   width: 120,
                   height: 36,
                   child: Align(
-                    alignment: isLeft ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: Alignment.centerRight,
                     child: Text(
-                      _categories[i],
+                      cat,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: fontWeight,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Right items
+    for (int i = 0; i < _rightCategories.length; i++) {
+      final y = (i - _scrollPosition) * 44.0;
+      final distance = (i - _scrollPosition).abs();
+      final opacity = (1.0 - (distance * 0.36)).clamp(0.0, 1.0);
+      if (opacity <= 0.0) continue;
+      
+      final scale = (1.12 - (distance * 0.12)).clamp(0.78, 1.12);
+      
+      final cat = _rightCategories[i];
+      final isSelected = selected.contains(cat);
+      
+      Color textColor;
+      if (isSelected) {
+        textColor = WellLessColors.primary;
+      } else if (i == _selectedIndex) {
+        textColor = Colors.white;
+      } else {
+        textColor = WellLessColors.dim;
+      }
+      
+      final fontWeight = i == _selectedIndex ? FontWeight.w900 : FontWeight.w700;
+      
+      list.add(
+        Positioned(
+          left: 125.0 + getXOffset(y),
+          top: 130.0 + y - (18.0 * scale),
+          child: Opacity(
+            opacity: opacity,
+            child: Transform.scale(
+              scale: scale,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (selected.contains(cat)) {
+                      selected.remove(cat);
+                    } else {
+                      selected.add(cat);
+                    }
+                  });
+                },
+                child: SizedBox(
+                  width: 120,
+                  height: 36,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      cat,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: fontWeight,
@@ -2082,7 +2146,7 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          _categories[_selectedIndex],
+                          '${_leftCategories[_selectedIndex]} / ${_rightCategories[_selectedIndex]}',
                           style: condensed(
                             size: 11,
                             weight: FontWeight.w800,
@@ -2134,15 +2198,26 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
   );
 }
 
-const _categories = [
-  '스킨/토너',
-  '클렌징폼/젤',
-  '에센스/세럼/앰플',
-  '클렌징오일/밤',
-  '미스트/오일',
-  '필링&스크럽',
+const _leftCategories = [
+  '토너',
+  '스킨',
+  '에센스',
+  '앰플',
+  '오일',
+  '세럼',
   '로션',
-  '클렌징워터/밀크',
+  '미스트',
+];
+
+const _rightCategories = [
+  '클렌징젤',
+  '클렌징폼',
+  '클렌징티슈',
+  '클렌징오일',
+  '클렌징밤',
+  '필링&스크럽',
+  '클렌징워터',
+  '클렌징밀크',
 ];
 
 class ProductInputScreen extends StatelessWidget {
@@ -2503,11 +2578,12 @@ class _LoadingScreenState extends State<LoadingScreen>
                           offset: Offset(0.0, _mainTranslateY.value),
                           child: Opacity(
                             opacity: _mainOpacity.value,
-                            child: RichText(
-                              text: const TextSpan(
+                            child: Text.rich(
+                              const TextSpan(
                                 style: TextStyle(
                                   fontSize: 23,
                                   fontWeight: FontWeight.w900,
+                                  color: Colors.white,
                                 ),
                                 children: [
                                   TextSpan(text: '사용자님의 '),

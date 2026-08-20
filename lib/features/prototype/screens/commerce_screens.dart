@@ -150,6 +150,7 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
                         alignment: Alignment.center,
                         children: [
                           CustomPaint(
+                            size: const Size(98, 98),
                             painter: _CheckmarkPainter(
                               circleProgress: _circleProgress.value,
                               checkProgress: _checkProgress.value,
@@ -280,7 +281,9 @@ class _CheckmarkPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 6;
 
-    if (circleProgress > 0.0) {
+    if (circleProgress >= 0.99) {
+      canvas.drawCircle(center, radius, paint);
+    } else if (circleProgress > 0.0) {
       final path = Path()
         ..addArc(
           Rect.fromCircle(center: center, radius: radius),
@@ -1285,7 +1288,9 @@ class _OrderCompleteCheckPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 2.25;
 
-    if (circleProgress > 0.0) {
+    if (circleProgress >= 0.99) {
+      canvas.drawCircle(center, radius, paint);
+    } else if (circleProgress > 0.0) {
       final path = Path()
         ..addArc(
           Rect.fromCircle(center: center, radius: radius),

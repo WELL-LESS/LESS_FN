@@ -153,34 +153,6 @@ class _WellLessFlowState extends State<WellLessFlow> {
               switchInCurve: Curves.easeInOutCubic,
               switchOutCurve: Curves.easeInOutCubic,
               transitionBuilder: (child, animation) {
-                final isIncoming = child.key == ValueKey(_step);
-
-                if (_step == FlowStep.code) {
-                  if (isIncoming) {
-                    // Incoming CodeScreen: slides up from bottom
-                    final slideIn = Tween<Offset>(
-                      begin: const Offset(0.0, 0.08),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
-
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(position: slideIn, child: child),
-                    );
-                  } else {
-                    // Outgoing IntroSplashScreen: slides up to top
-                    final slideOut = Tween<Offset>(
-                      begin: const Offset(0.0, -0.08),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInCubic));
-
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(position: slideOut, child: child),
-                    );
-                  }
-                }
-
                 return FadeTransition(opacity: animation, child: child);
               },
               child: KeyedSubtree(key: ValueKey(_step), child: screen),
