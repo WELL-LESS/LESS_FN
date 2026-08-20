@@ -403,10 +403,10 @@ class RevealWidget extends StatelessWidget {
       ),
     );
 
-    final translateAnimation = Tween<double>(begin: 8.0, end: 0.0).animate(
+    final translateAnimation = Tween<double>(begin: 14.0, end: 0.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: const Cubic(0.22, 1.0, 0.36, 1.0)),
+        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: const Cubic(0.25, 1.0, 0.25, 1.0)),
       ),
     );
 
@@ -905,6 +905,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         fontSize: 36,
                         height: 1.1,
                         fontWeight: FontWeight.w900,
+                        color: Colors.white,
                       ),
                       children: [
                         TextSpan(text: 'WELL '),
@@ -1205,9 +1206,11 @@ class ReportScreen extends StatefulWidget {
   State<ReportScreen> createState() => _ReportScreenState();
 }
 
-class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderStateMixin {
+class _ReportScreenState extends State<ReportScreen> with TickerProviderStateMixin {
   bool _details = false;
+  String? _activeFamilyCode;
   late final AnimationController _revealController;
+  late final AnimationController _cardsController;
 
   @override
   void initState() {
@@ -1216,12 +1219,18 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
+    _cardsController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 380),
+    );
     _revealController.forward();
+    _cardsController.forward();
   }
 
   @override
   void dispose() {
     _revealController.dispose();
+    _cardsController.dispose();
     super.dispose();
   }
 
@@ -1306,14 +1315,24 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                     child: _ReportTab(
                       label: '피부 타입',
                       active: !_details,
-                      onTap: () => setState(() => _details = false),
+                      onTap: () {
+                        setState(() {
+                          _details = false;
+                          _activeFamilyCode = null;
+                          _cardsController.forward(from: 0.0);
+                        });
+                      },
                     ),
                   ),
                   Expanded(
                     child: _ReportTab(
                       label: '상세 분석',
                       active: _details,
-                      onTap: () => setState(() => _details = true),
+                      onTap: () {
+                        setState(() {
+                          _details = true;
+                        });
+                      },
                     ),
                   ),
                 ],
@@ -1325,7 +1344,16 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
         Expanded(
           child: _details
               ? const _DetailedMetrics()
-              : _SkinTypeSummary(revealController: _revealController),
+              : _SkinTypeSummary(
+                  revealController: _cardsController,
+                  activeFamilyCode: _activeFamilyCode,
+                  onSelectFamily: (code) {
+                    setState(() => _activeFamilyCode = code);
+                  },
+                  onCloseFamily: () {
+                    setState(() => _activeFamilyCode = null);
+                  },
+                ),
         ),
       ],
     ),
@@ -1362,9 +1390,17 @@ class _ReportTab extends StatelessWidget {
 }
 
 class _SkinTypeSummary extends StatelessWidget {
-  const _SkinTypeSummary({required this.revealController});
+  const _SkinTypeSummary({
+    required this.revealController,
+    required this.activeFamilyCode,
+    required this.onSelectFamily,
+    required this.onCloseFamily,
+  });
 
   final AnimationController revealController;
+  final String? activeFamilyCode;
+  final ValueChanged<String> onSelectFamily;
+  final VoidCallback onCloseFamily;
 
   void _showTypes(BuildContext context, _SkinFamilyData family) =>
       showModalBottomSheet<void>(
@@ -1372,7 +1408,9 @@ class _SkinTypeSummary extends StatelessWidget {
         backgroundColor: Colors.transparent,
         isScrollControlled: true,
         builder: (_) => _SkinTypeSheet(family: family),
-      );
+      ).then((_) {
+        onCloseFamily();
+      });
 
   @override
   Widget build(BuildContext context) => Column(
@@ -1381,8 +1419,8 @@ class _SkinTypeSummary extends StatelessWidget {
         children: [
           _TitleReveal(
             controller: revealController,
-            start: 0.36,
-            duration: 0.3,
+            start: 0.0,
+            duration: 0.22,
             child: Text(
               '#OSP',
               style: condensed(
@@ -1397,8 +1435,8 @@ class _SkinTypeSummary extends StatelessWidget {
           Expanded(
             child: RevealWidget(
               controller: revealController,
-              start: 0.44,
-              duration: 0.3,
+              start: 0.05,
+              duration: 0.22,
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1420,8 +1458,8 @@ class _SkinTypeSummary extends StatelessWidget {
       const SizedBox(height: 38),
       RevealWidget(
         controller: revealController,
-        start: 0.52,
-        duration: 0.3,
+        start: 0.1,
+        duration: 0.22,
         child: const Text(
           '다른 피부 타입도 확인해볼까요?',
           style: TextStyle(fontSize: 12, color: WellLessColors.dim),
@@ -1434,13 +1472,16 @@ class _SkinTypeSummary extends StatelessWidget {
             Expanded(
               child: _CardReveal(
                 controller: revealController,
-                start: 0.58 + (index * 0.08),
-                duration: 0.25,
+                start: 0.15 + (index * 0.05),
+                duration: 0.20,
                 child: _TypeCard(
                   code: _skinFamilies[index].code,
                   label: _skinFamilies[index].label,
-                  active: _skinFamilies[index].code == 'O',
-                  onTap: () => _showTypes(context, _skinFamilies[index]),
+                  active: _skinFamilies[index].code == activeFamilyCode,
+                  onTap: () {
+                    onSelectFamily(_skinFamilies[index].code);
+                    _showTypes(context, _skinFamilies[index]);
+                  },
                 ),
               ),
             ),
@@ -1850,7 +1891,7 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProviderStateMixin {
-  final selected = <String>{'클렌징젤', '클렌징폼', '오일'};
+  final selected = <String>{};
   double _scrollPosition = 4.0;
   late final AnimationController _snapController;
   Animation<double>? _snapAnimation;
@@ -1910,15 +1951,15 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
 
   (double, double) _getBottleSize(int index) {
     return switch (index) {
-      0 => (100.0, 200.0), // 스킨/토너: Standard
-      1 => (110.0, 180.0), // 클렌징폼/젤: Tube
-      2 => (90.0, 170.0),  // 에센스/세럼/앰플: Dropper
-      3 => (130.0, 120.0), // 클렌징오일/밤: Jar
-      4 => (80.0, 210.0),  // 미스트/오일: Slim
-      5 => (95.0, 150.0),  // 필링&스크럽: Short container
-      6 => (105.0, 190.0), // 로션: Pump bottle
-      7 => (115.0, 200.0), // 클렌징워터/밀크: Large round bottle
-      _ => (100.0, 200.0),
+      0 => (60.0, 180.0),  // Toner/Skin: Tall slim
+      1 => (80.0, 160.0),  // Cleansing Foam: Tube
+      2 => (60.0, 150.0),  // Essence: Dropper
+      3 => (70.0, 140.0),  // Ampoule: Bell
+      4 => (90.0, 110.0),  // Cleansing Balm/Jar: Wide short
+      5 => (65.0, 160.0),  // Serum: Pump
+      6 => (75.0, 170.0),  // Lotion: Wide Pump
+      7 => (55.0, 190.0),  // Mist: Slim tall spray
+      _ => (60.0, 180.0),
     };
   }
 
@@ -1926,17 +1967,15 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
     final absY = y.abs();
     final factor = (absY / 130.0).clamp(0.0, 1.0);
     final drop = (1.0 - factor * factor) * 32.0;
-    return 52.0 + drop;
+    return 26.0 + drop;
   }
 
   Widget _buildBottle(int index) {
     final size = _getBottleSize(index);
-    return SvgPicture.asset(
-      'assets/icons/category_bottle.svg',
+    return CustomPaint(
       key: ValueKey(index),
-      width: size.$1,
-      height: size.$2,
-      fit: BoxFit.contain,
+      size: Size(size.$1, size.$2),
+      painter: _CosmeticBottlePainter(index: index),
     );
   }
 
@@ -1954,7 +1993,6 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       
       final cat = _leftCategories[i];
       final isSelected = selected.contains(cat);
-      
       Color textColor;
       if (isSelected) {
         textColor = WellLessColors.primary;
@@ -1963,7 +2001,6 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       } else {
         textColor = WellLessColors.dim;
       }
-      
       final fontWeight = i == _selectedIndex ? FontWeight.w900 : FontWeight.w700;
       
       list.add(
@@ -2017,7 +2054,6 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       
       final cat = _rightCategories[i];
       final isSelected = selected.contains(cat);
-      
       Color textColor;
       if (isSelected) {
         textColor = WellLessColors.primary;
@@ -2026,7 +2062,6 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       } else {
         textColor = WellLessColors.dim;
       }
-      
       final fontWeight = i == _selectedIndex ? FontWeight.w900 : FontWeight.w700;
       
       list.add(
@@ -2657,4 +2692,207 @@ class _LoadingScreenState extends State<LoadingScreen>
       ),
     );
   }
+}
+
+class _CosmeticBottlePainter extends CustomPainter {
+  const _CosmeticBottlePainter({required this.index});
+  final int index;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFECECEC)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final center = Offset(size.width / 2, size.height / 2);
+
+    switch (index) {
+      case 0: // Toner / Skin: Tall cylinder bottle
+        // Cap
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy - 60), width: 22, height: 16),
+            const Radius.circular(3),
+          ),
+          paint,
+        );
+        // Neck
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset(center.dx, center.dy - 46), width: 14, height: 12),
+          paint,
+        );
+        // Body
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy + 15), width: 44, height: 110),
+            const Radius.circular(8),
+          ),
+          paint,
+        );
+        break;
+
+      case 1: // Cleansing Foam: Upside down tube
+        // Cap at the bottom
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy + 60), width: 34, height: 16),
+            const Radius.circular(2),
+          ),
+          paint,
+        );
+        // Tube body
+        final path = Path()
+          ..moveTo(center.dx - 17, center.dy + 52) // cap connection left
+          ..lineTo(center.dx - 28, center.dy - 60) // flare out to top left
+          ..quadraticBezierTo(center.dx, center.dy - 65, center.dx + 28, center.dy - 60) // top edge curve
+          ..lineTo(center.dx + 17, center.dy + 52) // cap connection right
+          ..close();
+        canvas.drawPath(path, paint);
+        // Crimped edge detail at top
+        canvas.drawLine(Offset(center.dx - 28, center.dy - 56), Offset(center.dx + 28, center.dy - 56), paint);
+        break;
+
+      case 2: // Essence: Dropper bottle
+      case 3: // Ampoule: Bell-shaped dropper bottle
+        final isBell = index == 3;
+        // Bulb
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy - 54), width: 16, height: 18),
+            const Radius.circular(6),
+          ),
+          paint,
+        );
+        // Collar
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset(center.dx, center.dy - 40), width: 22, height: 10),
+          paint,
+        );
+        // Body
+        if (isBell) {
+          // Flare/Bell shape
+          final bodyPath = Path()
+            ..moveTo(center.dx - 11, center.dy - 35)
+            ..lineTo(center.dx - 26, center.dy + 50)
+            ..quadraticBezierTo(center.dx, center.dy + 55, center.dx + 26, center.dy + 50)
+            ..lineTo(center.dx + 11, center.dy - 35)
+            ..close();
+          canvas.drawPath(bodyPath, paint);
+        } else {
+          // Oval cylinder
+          canvas.drawRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromCenter(center: Offset(center.dx, center.dy + 10), width: 44, height: 90),
+              const Radius.circular(12),
+            ),
+            paint,
+          );
+        }
+        // Pipette line inside
+        canvas.drawLine(Offset(center.dx, center.dy - 35), Offset(center.dx, center.dy + 25), paint);
+        break;
+
+      case 4: // Balm / Jar: Short wide jar
+        // Lid
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy - 20), width: 68, height: 14),
+            const Radius.circular(2),
+          ),
+          paint,
+        );
+        // Body
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy + 18), width: 70, height: 60),
+            const Radius.circular(6),
+          ),
+          paint,
+        );
+        break;
+
+      case 5: // Serum: Pump bottle
+        // Body
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy + 15), width: 42, height: 110),
+            const Radius.circular(6),
+          ),
+          paint,
+        );
+        // Collar
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset(center.dx, center.dy - 45), width: 18, height: 10),
+          paint,
+        );
+        // Pump head (L-shape nozzle)
+        final pumpPath = Path()
+          ..moveTo(center.dx - 9, center.dy - 50)
+          ..lineTo(center.dx - 9, center.dy - 64)
+          ..lineTo(center.dx + 6, center.dy - 64)
+          ..lineTo(center.dx + 6, center.dy - 50)
+          ..moveTo(center.dx - 9, center.dy - 61)
+          ..lineTo(center.dx - 18, center.dy - 58); // nozzle tip
+        canvas.drawPath(pumpPath, paint);
+        break;
+
+      case 6: // Lotion: Large pump bottle
+        // Body (wider rectangle)
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy + 15), width: 54, height: 100),
+            const Radius.circular(8),
+          ),
+          paint,
+        );
+        // Pump collar
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset(center.dx, center.dy - 40), width: 22, height: 10),
+          paint,
+        );
+        // Large pump head nozzle
+        final pumpPath2 = Path()
+          ..moveTo(center.dx - 11, center.dy - 45)
+          ..lineTo(center.dx - 11, center.dy - 60)
+          ..lineTo(center.dx + 11, center.dy - 60)
+          ..lineTo(center.dx + 11, center.dy - 45)
+          ..moveTo(center.dx - 11, center.dy - 56)
+          ..lineTo(center.dx - 24, center.dy - 52);
+        canvas.drawPath(pumpPath2, paint);
+        break;
+
+      case 7: // Mist: Tall spray bottle
+        // Body
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy + 20), width: 36, height: 120),
+            const Radius.circular(6),
+          ),
+          paint,
+        );
+        // Collar / spray head
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset(center.dx, center.dy - 45), width: 14, height: 10),
+          paint,
+        );
+        // Clear cap on top
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(center.dx, center.dy - 58), width: 18, height: 16),
+            const Radius.circular(2),
+          ),
+          paint,
+        );
+        // Dip tube inside
+        canvas.drawLine(Offset(center.dx, center.dy - 40), Offset(center.dx, center.dy + 75), paint);
+        break;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _CosmeticBottlePainter oldDelegate) =>
+      oldDelegate.index != index;
 }

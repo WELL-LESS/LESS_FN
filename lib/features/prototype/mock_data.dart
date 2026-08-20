@@ -21,7 +21,6 @@ const finalRoutineProducts = <RoutineProduct>[
   RoutineProduct('Klairs 저자극 무향 토너', '토너', ''),
   RoutineProduct('The Ordinary 나이아신아마이드 10%', '세럼', ''),
   RoutineProduct('AAC 세이프 BHA 세럼', '세럼', 'AAC 추천'),
-  RoutineProduct('Laneige 워터뱅크 블루 HA', '크림', ''),
   RoutineProduct('Anessa 퍼펙트 UV', '선크림', ''),
 ];
 
