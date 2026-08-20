@@ -1,0 +1,15 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="71.9857" height="191.985" viewBox="0 0 71.9857 191.985" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="BottleSilhouette" clip-path="url(#clip0_0_4)">
+<path id="Vector" d="M35.9929 3.89159V19.4579" stroke="#ECECEC" stroke-width="1.81607" stroke-linecap="round"/>
+<path id="Vector_2" d="M35.9928 6.48598C37.7839 6.48598 39.2358 5.03405 39.2358 3.24299C39.2358 1.45194 37.7839 2.55585e-06 35.9928 2.55585e-06C34.2018 2.55585e-06 32.7499 1.45194 32.7499 3.24299C32.7499 5.03405 34.2018 6.48598 35.9928 6.48598Z" stroke="#ECECEC" stroke-width="1.81607"/>
+<path id="Vector_3" d="M28.2097 19.4579H43.776L46.3704 24.6467H25.6153L28.2097 19.4579Z" stroke="#ECECEC" stroke-width="1.55664"/>
+<path id="Vector_4" d="M42.4788 23.3495H29.5069C27.3576 23.3495 25.6153 25.0919 25.6153 27.2411V45.4019C25.6153 47.5511 27.3576 49.2934 29.5069 49.2934H42.4788C44.6281 49.2934 46.3704 47.5511 46.3704 45.4019V27.2411C46.3704 25.0919 44.6281 23.3495 42.4788 23.3495Z" stroke="#ECECEC" stroke-width="1.81607"/>
+<path id="Vector_5" d="M12.6433 67.4542C12.6433 51.8878 25.6153 49.2934 25.6153 49.2934H46.3704C46.3704 49.2934 59.3424 51.8878 59.3424 67.4542" stroke="#ECECEC" stroke-width="1.81607" stroke-linecap="round"/>
+<path id="Vector_6" d="M60.6396 90.8037C60.6396 77.1917 49.6049 66.157 35.9929 66.157C22.3808 66.157 11.3461 77.1917 11.3461 90.8037V155.664C11.3461 169.276 22.3808 180.31 35.9929 180.31C49.6049 180.31 60.6396 169.276 60.6396 155.664V90.8037Z" stroke="#ECECEC" stroke-width="1.81607"/>
+</g>
+<defs>
+<clipPath id="clip0_0_4">
+<rect width="71.9857" height="191.985" fill="white"/>
+</clipPath>
+</defs>
+</svg>
