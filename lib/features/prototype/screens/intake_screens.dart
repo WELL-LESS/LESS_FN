@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:well_less_app/core/theme/well_less_theme.dart';
 import 'package:well_less_app/features/prototype/widgets.dart';
 
@@ -1989,7 +1990,9 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       final opacity = (1.0 - (distance * 0.36)).clamp(0.0, 1.0);
       if (opacity <= 0.0) continue;
       
-      final scale = (1.12 - (distance * 0.12)).clamp(0.78, 1.12);
+      // The category closest to the horizontal center is dominant. Items
+      // progressively shrink as they move away from that focal line.
+      final scale = (1.34 - (distance * 0.20)).clamp(0.72, 1.34);
       
       final cat = _leftCategories[i];
       final isSelected = selected.contains(cat);
@@ -2050,7 +2053,7 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       final opacity = (1.0 - (distance * 0.36)).clamp(0.0, 1.0);
       if (opacity <= 0.0) continue;
       
-      final scale = (1.12 - (distance * 0.12)).clamp(0.78, 1.12);
+      final scale = (1.34 - (distance * 0.20)).clamp(0.72, 1.34);
       
       final cat = _rightCategories[i];
       final isSelected = selected.contains(cat);
@@ -2394,14 +2397,43 @@ class _PhotoInput extends StatelessWidget {
   );
 }
 
-class CameraScreen extends StatelessWidget {
+class CameraScreen extends StatefulWidget {
   const CameraScreen({
     required this.onCancel,
     required this.onCapture,
     super.key,
   });
   final VoidCallback onCancel;
-  final VoidCallback onCapture;
+  final ValueChanged<String> onCapture;
+
+  @override
+  State<CameraScreen> createState() => _CameraScreenState();
+}
+
+class _CameraScreenState extends State<CameraScreen> {
+  final ImagePicker _picker = ImagePicker();
+  bool _capturing = false;
+
+  Future<void> _capture() async {
+    if (_capturing) return;
+    setState(() => _capturing = true);
+    try {
+      final image = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 88,
+        maxWidth: 1800,
+      );
+      if (image != null && mounted) widget.onCapture(image.path);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('카메라를 실행할 수 없습니다. 권한을 확인해주세요.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _capturing = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -2415,7 +2447,7 @@ class CameraScreen extends StatelessWidget {
               children: [
                 const SizedBox(width: 22),
                 GestureDetector(
-                  onTap: onCancel,
+                  onTap: widget.onCancel,
                   child: const Text(
                     '← 취소',
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
@@ -2464,7 +2496,7 @@ class CameraScreen extends StatelessWidget {
             ),
             child: Center(
               child: GestureDetector(
-                onTap: onCapture,
+                onTap: _capture,
                 child: Container(
                   width: 70,
                   height: 70,
@@ -2473,11 +2505,22 @@ class CameraScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: WellLessColors.primary),
                   ),
-                  child: const DecoratedBox(
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: WellLessColors.primary,
+                      color: _capturing
+                          ? WellLessColors.dim
+                          : WellLessColors.primary,
                     ),
+                    child: _capturing
+                        ? const Padding(
+                            padding: EdgeInsets.all(15),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: WellLessColors.background,
+                            ),
+                          )
+                        : null,
                   ),
                 ),
               ),

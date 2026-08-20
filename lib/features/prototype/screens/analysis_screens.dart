@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:well_less_app/core/theme/well_less_theme.dart';
+import 'package:well_less_app/features/prototype/ai_analysis.dart';
 import 'package:well_less_app/features/prototype/mock_data.dart';
 import 'package:well_less_app/features/prototype/widgets.dart';
 
@@ -8,11 +9,13 @@ class RoutineScreen extends StatefulWidget {
   const RoutineScreen({
     required this.onBack,
     required this.onAnalyze,
+    this.products,
     super.key,
   });
 
   final VoidCallback onBack;
   final VoidCallback onAnalyze;
+  final List<RoutineProduct>? products;
 
   @override
   State<RoutineScreen> createState() => _RoutineScreenState();
@@ -29,7 +32,11 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _items = List.from(routineProducts);
+    _items = List.from(
+      widget.products == null || widget.products!.isEmpty
+          ? routineProducts
+          : widget.products!,
+    );
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -329,6 +336,7 @@ class SuitabilityScreen extends StatefulWidget {
     required this.onBack,
     required this.onReplacement,
     required this.onFinal,
+    this.analysis,
     super.key,
   });
 
@@ -336,6 +344,7 @@ class SuitabilityScreen extends StatefulWidget {
   final VoidCallback onBack;
   final VoidCallback onReplacement;
   final VoidCallback onFinal;
+  final AiRoutineAnalysis? analysis;
 
   @override
   State<SuitabilityScreen> createState() => _SuitabilityScreenState();
@@ -343,12 +352,8 @@ class SuitabilityScreen extends StatefulWidget {
 
 class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProviderStateMixin {
   bool _comparisonVisible = false;
+  bool _removedFirst = false;
   bool _removedSecond = false;
-  
-  double _card2Scale = 1.0;
-  double _card2Opacity = 1.0;
-  double _card2TranslateX = 0.0;
-  bool _card2FullyRemoved = false;
 
   late final AnimationController _entranceController;
   late final AnimationController _comparisonController;
@@ -372,7 +377,8 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
       duration: const Duration(milliseconds: 300),
     );
 
-    _orbProgress = Tween<double>(begin: 0.0, end: 0.68).animate(
+    final targetScore = (widget.analysis?.overallScore ?? 68) / 100;
+    _orbProgress = Tween<double>(begin: 0.0, end: targetScore).animate(
       CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.55, curve: Curves.easeOut)),
     );
     _badgeProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -401,27 +407,16 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
     super.dispose();
   }
 
-  void _triggerRemoveSecond() {
-    setState(() {
-      _card2Scale = 0.97;
-      _card2Opacity = 0.4;
-    });
-    Future.delayed(const Duration(milliseconds: 220), () {
-      setState(() {
-        _card2TranslateX = -8.0;
-        _card2Opacity = 0.0;
-      });
-      Future.delayed(const Duration(milliseconds: 180), () {
-        setState(() {
-          _card2FullyRemoved = true;
-          _removedSecond = true;
-        });
-      });
-    });
-  }
+  void _triggerRemoveFirst() => setState(() => _removedFirst = true);
+
+  void _triggerRemoveSecond() => setState(() => _removedSecond = true);
 
   @override
   Widget build(BuildContext context) {
+    final removeCandidates = widget.analysis?.removeCandidates ?? const [];
+    final firstCandidate = removeCandidates.isEmpty ? null : removeCandidates.first;
+    final analyzedProducts = widget.analysis?.products ?? const [];
+    final firstProduct = analyzedProducts.isEmpty ? null : analyzedProducts.first;
     return FlowScaffold(
       title: '피부 적합도 분석 결과',
       onBack: widget.onBack,
@@ -451,6 +446,9 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
               orbProgress: _orbProgress.value,
               badgeProgress: _badgeProgress.value,
               entranceController: _entranceController,
+              productCount: analyzedProducts.isEmpty ? 8 : analyzedProducts.length,
+              unsuitableCount: widget.analysis == null ? 2 : removeCandidates.length,
+              summary: widget.analysis?.summary,
             ),
           ),
           const SizedBox(height: 28),
@@ -514,7 +512,8 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
                     scale: 0.97 + val * 0.03,
                     child: _RemoveProductCard(
                       selectedReplacement: widget.replacementSelected,
-                      onRemove: () {},
+                      removed: _removedFirst,
+                      onRemove: _triggerRemoveFirst,
                       onReplace: () {
                         if (!widget.replacementSelected) widget.onReplacement();
                         setState(() {
@@ -523,6 +522,9 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
                         });
                       },
                       cardProgress: val,
+                      productName: firstCandidate?.product ?? firstProduct?.name,
+                      score: firstProduct?.score,
+                      reason: firstCandidate?.reason ?? firstProduct?.description,
                     ),
                   ),
                 ),
@@ -532,17 +534,17 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
           const SizedBox(height: 14),
           
           // Product Card 2
-          if (!_card2FullyRemoved)
+          if (widget.analysis == null || removeCandidates.length > 1)
             AnimatedBuilder(
               animation: _entranceController,
               builder: (context, _) {
                 final val = _card2Progress.value;
                 return Opacity(
-                  opacity: val * _card2Opacity,
+                  opacity: val,
                   child: Transform.translate(
-                    offset: Offset(_card2TranslateX, (1.0 - val) * 12.0),
+                    offset: Offset(0.0, (1.0 - val) * 12.0),
                     child: Transform.scale(
-                      scale: (0.97 + val * 0.03) * _card2Scale,
+                      scale: 0.97 + val * 0.03,
                       child: _RemoveProductCard(
                         removed: _removedSecond,
                         onRemove: _triggerRemoveSecond,
@@ -571,11 +573,17 @@ class _ScoreSummary extends StatelessWidget {
     required this.orbProgress,
     required this.badgeProgress,
     required this.entranceController,
+    required this.productCount,
+    required this.unsuitableCount,
+    this.summary,
   });
 
   final double orbProgress;
   final double badgeProgress;
   final AnimationController entranceController;
+  final int productCount;
+  final int unsuitableCount;
+  final String? summary;
 
   @override
   Widget build(BuildContext context) {
@@ -673,17 +681,13 @@ class _ScoreRingPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: radius);
     const startAngle = -1.5707963267948966;
     final sweepAngle = 6.283185307179586 * progress;
-    final endAngle = startAngle + (sweepAngle > 0.0 ? sweepAngle : 0.0001);
-    final sectorShader = SweepGradient(
-      center: Alignment.center,
-      startAngle: startAngle,
-      endAngle: endAngle,
-      colors: const [
-        Color(0xFFD91820), // Darker red at the start
-        Color(0xFFFF3B30), // Mid-red
-        Color(0xFFFF9500), // Vibrant orange-yellow at leading tip
+    final sectorShader = const RadialGradient(
+      colors: [
+        Color(0xFFFFB000), // Yellow-red blend at the center
+        Color(0xFFFF4B24), // Orange-red transition
+        Color(0xFFD51620), // Red toward the outer edge
       ],
-      stops: const [0.0, 0.5, 1.0],
+      stops: [0.0, 0.48, 1.0],
     ).createShader(rect);
 
     final track = Paint()..color = const Color(0xFF0E0E0E);
@@ -691,7 +695,7 @@ class _ScoreRingPainter extends CustomPainter {
 
     if (sweepAngle > 0.0) {
       final outerGlow = Paint()
-        ..color = const Color(0xFFFF5E00).withValues(alpha: 0.6)
+        ..color = const Color(0xFFD51620).withValues(alpha: 0.58)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
       canvas.drawArc(rect, startAngle, sweepAngle, true, outerGlow);
 
@@ -701,7 +705,7 @@ class _ScoreRingPainter extends CustomPainter {
       canvas.drawArc(rect, startAngle, sweepAngle, true, sector);
 
       final innerGlow = Paint()
-        ..color = const Color(0xFFFF342E).withValues(alpha: 0.45)
+        ..color = const Color(0xFFFF7A1A).withValues(alpha: 0.42)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius * 0.88),
@@ -712,7 +716,7 @@ class _ScoreRingPainter extends CustomPainter {
       );
 
       final edge = Paint()
-        ..color = const Color(0xFFFF4238).withValues(alpha: 0.42)
+        ..color = const Color(0xFFD51620).withValues(alpha: 0.50)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
@@ -732,6 +736,9 @@ class _RemoveProductCard extends StatefulWidget {
     this.selectedReplacement = false,
     this.removed = false,
     required this.cardProgress,
+    this.productName,
+    this.score,
+    this.reason,
   });
 
   final VoidCallback onRemove;
@@ -739,6 +746,9 @@ class _RemoveProductCard extends StatefulWidget {
   final bool selectedReplacement;
   final bool removed;
   final double cardProgress;
+  final String? productName;
+  final int? score;
+  final String? reason;
 
   @override
   State<_RemoveProductCard> createState() => _RemoveProductCardState();
@@ -777,7 +787,7 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
         
     // Score count-up logic
     final double innerVal = widget.cardProgress;
-    final scoreValue = widget.selectedReplacement ? 86 : 22;
+    final scoreValue = widget.selectedReplacement ? 86 : (widget.score ?? 22);
     final scoreCount = (innerVal * scoreValue).round();
     
     // Scale pop for scores
@@ -857,9 +867,9 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                                             key: const ValueKey(false),
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              const Text(
-                                                "Paula's Choice BHA 2%",
-                                                style: TextStyle(fontSize: 13),
+                                              Text(
+                                                widget.productName ?? "Paula's Choice BHA 2%",
+                                                style: const TextStyle(fontSize: 13),
                                               ),
                                               const SizedBox(height: 2),
                                               const SmallPill('세럼'),
