@@ -88,41 +88,72 @@ class _IntroSplashScreenState extends State<IntroSplashScreen>
         curve: const Interval(0.083, 0.278, curve: Curves.easeOutCubic),
       ),
     );
-    _text2Scale = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 0.96, end: 1.02).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 75,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.02, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
-        weight: 25,
-      ),
-    ]).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.083, 0.278),
-      ),
-    );
+    _text2Scale =
+        TweenSequence<double>([
+          TweenSequenceItem(
+            tween: Tween<double>(
+              begin: 0.96,
+              end: 1.02,
+            ).chain(CurveTween(curve: Curves.easeOut)),
+            weight: 75,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(
+              begin: 1.02,
+              end: 1.0,
+            ).chain(CurveTween(curve: Curves.easeIn)),
+            weight: 25,
+          ),
+        ]).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.083, 0.278),
+          ),
+        );
 
     // 3. Korean Compression / English Transition: 950ms to 1350ms (0.528 to 0.750)
     final compressProgress = CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.528, 0.750, curve: Curves.easeInOutCubic),
     );
-    _koreanOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(compressProgress);
-    _koreanCompressY = Tween<double>(begin: 0.0, end: 8.0).animate(compressProgress);
-    _koreanScaleX = Tween<double>(begin: 1.0, end: 0.88).animate(compressProgress);
-    _koreanScaleY = Tween<double>(begin: 1.0, end: 0.88).animate(compressProgress);
+    _koreanOpacity = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(compressProgress);
+    _koreanCompressY = Tween<double>(
+      begin: 0.0,
+      end: 8.0,
+    ).animate(compressProgress);
+    _koreanScaleX = Tween<double>(
+      begin: 1.0,
+      end: 0.88,
+    ).animate(compressProgress);
+    _koreanScaleY = Tween<double>(
+      begin: 1.0,
+      end: 0.88,
+    ).animate(compressProgress);
 
-    _englishOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(compressProgress);
-    _englishExpandY = Tween<double>(begin: 8.0, end: 0.0).animate(compressProgress);
+    _englishOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(compressProgress);
+    _englishExpandY = Tween<double>(
+      begin: 8.0,
+      end: 0.0,
+    ).animate(compressProgress);
     _englishScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.88, end: 1.02).chain(CurveTween(curve: Curves.easeOutCubic)),
+        tween: Tween<double>(
+          begin: 0.88,
+          end: 1.02,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 75,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.02, end: 1.0).chain(CurveTween(curve: Curves.easeInCubic)),
+        tween: Tween<double>(
+          begin: 1.02,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInCubic)),
         weight: 25,
       ),
     ]).animate(compressProgress);
@@ -194,40 +225,46 @@ class _IntroSplashScreenState extends State<IntroSplashScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Transform.translate(
-                            offset: Offset(0.0, _text1TranslateY.value + _koreanCompressY.value),
+                            offset: Offset(
+                              0.0,
+                              _text1TranslateY.value + _koreanCompressY.value,
+                            ),
                             child: Transform.scale(
                               scale: _text1Scale.value,
                               child: const Text(
-                                  '\ub354\uc801\uac8c',
-                                  style: TextStyle(
-                                    fontSize: 76,
-                                    height: 0.92,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -3,
-                                  ),
+                                '\ub354\uc801\uac8c',
+                                style: TextStyle(
+                                  fontSize: 76,
+                                  height: 0.92,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -3,
                                 ),
                               ),
                             ),
+                          ),
                           Transform.translate(
-                            offset: Offset(0.0, _text2TranslateY.value - _koreanCompressY.value),
+                            offset: Offset(
+                              0.0,
+                              _text2TranslateY.value - _koreanCompressY.value,
+                            ),
                             child: Transform.scale(
                               scale: _text2Scale.value,
                               child: const Text(
-                                  '\ub354\uc88b\uac8c',
-                                  style: TextStyle(
-                                    color: WellLessColors.primary,
-                                    fontSize: 76,
-                                    height: 0.92,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -3,
-                                  ),
+                                '\ub354\uc88b\uac8c',
+                                style: TextStyle(
+                                  color: WellLessColors.primary,
+                                  fontSize: 76,
+                                  height: 0.92,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -3,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
 
                   // English Brand Column (Layout-stable using Opacity)
                   Opacity(
@@ -274,7 +311,7 @@ class _IntroSplashScreenState extends State<IntroSplashScreen>
                   ),
                 ],
               ),
-              
+
               // Faint Subtext: AI SKINCARE ANALYSIS (Layout-stable using Opacity)
               const SizedBox(height: 32),
               Opacity(
@@ -400,14 +437,22 @@ class RevealWidget extends StatelessWidget {
     final opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: Curves.easeOut),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: Curves.easeOut,
+        ),
       ),
     );
 
     final translateAnimation = Tween<double>(begin: 14.0, end: 0.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: const Cubic(0.25, 1.0, 0.25, 1.0)),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: const Cubic(0.25, 1.0, 0.25, 1.0),
+        ),
       ),
     );
 
@@ -495,7 +540,8 @@ class ShakeErrorText extends StatefulWidget {
   State<ShakeErrorText> createState() => _ShakeErrorTextState();
 }
 
-class _ShakeErrorTextState extends State<ShakeErrorText> with SingleTickerProviderStateMixin {
+class _ShakeErrorTextState extends State<ShakeErrorText>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _translateY;
   late final Animation<double> _opacity;
@@ -522,18 +568,34 @@ class _ShakeErrorTextState extends State<ShakeErrorText> with SingleTickerProvid
       ),
     );
 
-    _shake = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 0.0, end: -2.0), weight: 20),
-      TweenSequenceItem(tween: Tween<double>(begin: -2.0, end: 2.0), weight: 20),
-      TweenSequenceItem(tween: Tween<double>(begin: 2.0, end: -1.5), weight: 20),
-      TweenSequenceItem(tween: Tween<double>(begin: -1.5, end: 1.0), weight: 20),
-      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 0.0), weight: 20),
-    ]).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.44, 1.0, curve: Curves.linear),
-      ),
-    );
+    _shake =
+        TweenSequence<double>([
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 0.0, end: -2.0),
+            weight: 20,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(begin: -2.0, end: 2.0),
+            weight: 20,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 2.0, end: -1.5),
+            weight: 20,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(begin: -1.5, end: 1.0),
+            weight: 20,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 1.0, end: 0.0),
+            weight: 20,
+          ),
+        ]).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.44, 1.0, curve: Curves.linear),
+          ),
+        );
 
     _controller.forward();
   }
@@ -566,8 +628,13 @@ class _ShakeErrorTextState extends State<ShakeErrorText> with SingleTickerProvid
 }
 
 class CodeScreen extends StatefulWidget {
-  const CodeScreen({required this.onSuccess, super.key});
+  const CodeScreen({
+    required this.onSubmit,
+    required this.onSuccess,
+    super.key,
+  });
 
+  final Future<String?> Function(String personalCode) onSubmit;
   final VoidCallback onSuccess;
 
   @override
@@ -576,7 +643,8 @@ class CodeScreen extends StatefulWidget {
 
 class _CodeScreenState extends State<CodeScreen> with TickerProviderStateMixin {
   final _controller = TextEditingController();
-  bool _invalid = false;
+  String? _errorMessage;
+  bool _submitting = false;
   late final AnimationController _revealController;
   late final AnimationController _exitController;
 
@@ -603,22 +671,37 @@ class _CodeScreenState extends State<CodeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
+    if (_submitting) return;
     FocusScope.of(context).unfocus();
-    if (_controller.text.trim().toUpperCase() == 'WHS-2026-1234') {
-      _exitController.forward().then((_) {
-        widget.onSuccess();
-      });
+    setState(() {
+      _submitting = true;
+      _errorMessage = null;
+    });
+    final error = await widget.onSubmit(_controller.text);
+    if (!mounted) return;
+    if (error == null) {
+      await _exitController.forward();
+      if (mounted) widget.onSuccess();
     } else {
-      setState(() => _invalid = true);
+      setState(() {
+        _submitting = false;
+        _errorMessage = error;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final hasText = _controller.text.isNotEmpty;
-    final exitOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(_exitController);
-    final exitTranslateY = Tween<double>(begin: 0.0, end: -6.0).animate(_exitController);
+    final exitOpacity = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(_exitController);
+    final exitTranslateY = Tween<double>(
+      begin: 0.0,
+      end: -6.0,
+    ).animate(_exitController);
 
     return Scaffold(
       backgroundColor: WellLessColors.background,
@@ -766,7 +849,7 @@ class _CodeScreenState extends State<CodeScreen> with TickerProviderStateMixin {
                         textCapitalization: TextCapitalization.characters,
                         inputFormatters: [LengthLimitingTextInputFormatter(13)],
                         onChanged: (_) {
-                          setState(() => _invalid = false);
+                          setState(() => _errorMessage = null);
                         },
                         onSubmitted: (_) => _submit(),
                         cursorColor: WellLessColors.primary,
@@ -780,10 +863,14 @@ class _CodeScreenState extends State<CodeScreen> with TickerProviderStateMixin {
                         decoration: const InputDecoration(
                           contentPadding: EdgeInsets.symmetric(vertical: 12),
                           enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: WellLessColors.border),
+                            borderSide: BorderSide(
+                              color: WellLessColors.border,
+                            ),
                           ),
                           focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: WellLessColors.primary),
+                            borderSide: BorderSide(
+                              color: WellLessColors.primary,
+                            ),
                           ),
                         ),
                       ),
@@ -792,12 +879,10 @@ class _CodeScreenState extends State<CodeScreen> with TickerProviderStateMixin {
                 ),
 
                 // 6. Error text
-                if (_invalid)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 9, bottom: 12),
-                    child: ShakeErrorText(
-                      text: '고객 번호가 올바르지 않습니다. 다시 진행해주세요.',
-                    ),
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 9, bottom: 12),
+                    child: ShakeErrorText(text: _errorMessage!),
                   )
                 else
                   const SizedBox(height: 10),
@@ -808,8 +893,8 @@ class _CodeScreenState extends State<CodeScreen> with TickerProviderStateMixin {
                   start: 0.50,
                   duration: 0.4,
                   child: PrimaryButton(
-                    label: 'WELL LESS 입장하기 →',
-                    enabled: hasText,
+                    label: _submitting ? '확인 중...' : 'WELL LESS 입장하기 →',
+                    enabled: hasText && !_submitting,
                     onPressed: _submit,
                   ),
                 ),
@@ -837,7 +922,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _revealController;
 
   @override
@@ -1059,13 +1145,21 @@ class _FaceImageReveal extends StatelessWidget {
     final opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: Curves.easeOut),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: Curves.easeOut,
+        ),
       ),
     );
     final scale = Tween<double>(begin: 0.94, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: Curves.easeOut),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: Curves.easeOut,
+        ),
       ),
     );
     return AnimatedBuilder(
@@ -1073,10 +1167,7 @@ class _FaceImageReveal extends StatelessWidget {
       builder: (context, child) {
         return Opacity(
           opacity: opacity.value,
-          child: Transform.scale(
-            scale: scale.value,
-            child: child,
-          ),
+          child: Transform.scale(scale: scale.value, child: child),
         );
       },
       child: child,
@@ -1102,19 +1193,31 @@ class _TitleReveal extends StatelessWidget {
     final opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: Curves.easeOut),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: Curves.easeOut,
+        ),
       ),
     );
     final scale = Tween<double>(begin: 0.97, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: Curves.easeOut),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: Curves.easeOut,
+        ),
       ),
     );
     final translate = Tween<double>(begin: 8.0, end: 0.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: const Cubic(0.22, 1.0, 0.36, 1.0)),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: const Cubic(0.22, 1.0, 0.36, 1.0),
+        ),
       ),
     );
 
@@ -1125,10 +1228,7 @@ class _TitleReveal extends StatelessWidget {
           opacity: opacity.value,
           child: Transform.translate(
             offset: Offset(0.0, translate.value),
-            child: Transform.scale(
-              scale: scale.value,
-              child: child,
-            ),
+            child: Transform.scale(scale: scale.value, child: child),
           ),
         );
       },
@@ -1155,24 +1255,45 @@ class _CardReveal extends StatelessWidget {
     final opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: Curves.easeOut),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: Curves.easeOut,
+        ),
       ),
     );
     final translate = Tween<double>(begin: 10.0, end: 0.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0), curve: const Cubic(0.22, 1.0, 0.36, 1.0)),
+        curve: Interval(
+          start,
+          (start + duration).clamp(0.0, 1.0),
+          curve: const Cubic(0.22, 1.0, 0.36, 1.0),
+        ),
       ),
     );
-    final scale = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 0.96, end: 1.02).chain(CurveTween(curve: Curves.easeOut)), weight: 80),
-      TweenSequenceItem(tween: Tween<double>(begin: 1.02, end: 1.0).chain(CurveTween(curve: Curves.easeIn)), weight: 20),
-    ]).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Interval(start, (start + duration).clamp(0.0, 1.0)),
-      ),
-    );
+    final scale =
+        TweenSequence<double>([
+          TweenSequenceItem(
+            tween: Tween<double>(
+              begin: 0.96,
+              end: 1.02,
+            ).chain(CurveTween(curve: Curves.easeOut)),
+            weight: 80,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(
+              begin: 1.02,
+              end: 1.0,
+            ).chain(CurveTween(curve: Curves.easeIn)),
+            weight: 20,
+          ),
+        ]).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Interval(start, (start + duration).clamp(0.0, 1.0)),
+          ),
+        );
 
     return AnimatedBuilder(
       animation: controller,
@@ -1181,10 +1302,7 @@ class _CardReveal extends StatelessWidget {
           opacity: opacity.value,
           child: Transform.translate(
             offset: Offset(0.0, translate.value),
-            child: Transform.scale(
-              scale: scale.value,
-              child: child,
-            ),
+            child: Transform.scale(scale: scale.value, child: child),
           ),
         );
       },
@@ -1207,7 +1325,8 @@ class ReportScreen extends StatefulWidget {
   State<ReportScreen> createState() => _ReportScreenState();
 }
 
-class _ReportScreenState extends State<ReportScreen> with TickerProviderStateMixin {
+class _ReportScreenState extends State<ReportScreen>
+    with TickerProviderStateMixin {
   bool _details = false;
   String? _activeFamilyCode;
   late final AnimationController _revealController;
@@ -1253,7 +1372,10 @@ class _ReportScreenState extends State<ReportScreen> with TickerProviderStateMix
           controller: _revealController,
           start: 0.0,
           duration: 0.3,
-          child: const SectionEyebrow('WHS-2026-1234', color: WellLessColors.muted),
+          child: const SectionEyebrow(
+            'WHS-2026-1234',
+            color: WellLessColors.muted,
+          ),
         ),
         const SizedBox(height: 8),
         RevealWidget(
@@ -1288,10 +1410,7 @@ class _ReportScreenState extends State<ReportScreen> with TickerProviderStateMix
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: Container(
-                  height: 1,
-                  color: WellLessColors.border,
-                ),
+                child: Container(height: 1, color: WellLessColors.border),
               ),
               Positioned(
                 left: 0,
@@ -1300,13 +1419,12 @@ class _ReportScreenState extends State<ReportScreen> with TickerProviderStateMix
                 child: AnimatedAlign(
                   duration: const Duration(milliseconds: 250),
                   curve: const Cubic(0.22, 1.0, 0.36, 1.0),
-                  alignment: _details ? Alignment.bottomRight : Alignment.bottomLeft,
+                  alignment: _details
+                      ? Alignment.bottomRight
+                      : Alignment.bottomLeft,
                   child: FractionallySizedBox(
                     widthFactor: 0.5,
-                    child: Container(
-                      height: 2,
-                      color: WellLessColors.primary,
-                    ),
+                    child: Container(height: 2, color: WellLessColors.primary),
                   ),
                 ),
               ),
@@ -1565,7 +1683,8 @@ class _SkinTypeSheet extends StatefulWidget {
   State<_SkinTypeSheet> createState() => _SkinTypeSheetState();
 }
 
-class _SkinTypeSheetState extends State<_SkinTypeSheet> with SingleTickerProviderStateMixin {
+class _SkinTypeSheetState extends State<_SkinTypeSheet>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _sheetTranslateY;
   late final Animation<double> _sheetOpacity;
@@ -1671,24 +1790,29 @@ class _SkinTypeSheetState extends State<_SkinTypeSheet> with SingleTickerProvide
               ),
               ...List.generate(widget.family.types.length, (index) {
                 final item = widget.family.types[index];
-                
+
                 final start = 0.2 + (index * 0.08);
                 final end = (start + 0.3).clamp(0.0, 1.0);
-                
+
                 final itemOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
                   CurvedAnimation(
                     parent: _controller,
                     curve: Interval(start, end, curve: Curves.easeOut),
                   ),
                 );
-                
-                final itemTranslateY = Tween<double>(begin: 7.0, end: 0.0).animate(
-                  CurvedAnimation(
-                    parent: _controller,
-                    curve: Interval(start, end, curve: const Cubic(0.22, 1.0, 0.36, 1.0)),
-                  ),
-                );
-                
+
+                final itemTranslateY = Tween<double>(begin: 7.0, end: 0.0)
+                    .animate(
+                      CurvedAnimation(
+                        parent: _controller,
+                        curve: Interval(
+                          start,
+                          end,
+                          curve: const Cubic(0.22, 1.0, 0.36, 1.0),
+                        ),
+                      ),
+                    );
+
                 return AnimatedBuilder(
                   animation: _controller,
                   builder: (context, child) {
@@ -1885,13 +2009,14 @@ class CategoryScreen extends StatefulWidget {
     super.key,
   });
   final VoidCallback onBack;
-  final VoidCallback onContinue;
+  final ValueChanged<List<String>> onContinue;
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProviderStateMixin {
+class _CategoryScreenState extends State<CategoryScreen>
+    with SingleTickerProviderStateMixin {
   final selected = <String>{};
   double _scrollPosition = 4.0;
   late final AnimationController _snapController;
@@ -1926,7 +2051,8 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       _snapController.stop();
     }
     setState(() {
-      _scrollPosition = (_scrollPosition - (details.primaryDelta! / 44.0)).clamp(0.0, 7.0);
+      _scrollPosition = (_scrollPosition - (details.primaryDelta! / 44.0))
+          .clamp(0.0, 7.0);
     });
   }
 
@@ -1936,13 +2062,17 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
 
     _snapAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: start, end: target + (target - start > 0 ? 0.05 : -0.05))
-            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        tween: Tween<double>(
+          begin: start,
+          end: target + (target - start > 0 ? 0.05 : -0.05),
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 80,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: target + (target - start > 0 ? 0.05 : -0.05), end: target)
-            .chain(CurveTween(curve: Curves.easeInCubic)),
+        tween: Tween<double>(
+          begin: target + (target - start > 0 ? 0.05 : -0.05),
+          end: target,
+        ).chain(CurveTween(curve: Curves.easeInCubic)),
         weight: 20,
       ),
     ]).animate(_snapController);
@@ -1952,14 +2082,14 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
 
   (double, double) _getBottleSize(int index) {
     return switch (index) {
-      0 => (60.0, 180.0),  // Toner/Skin: Tall slim
-      1 => (80.0, 160.0),  // Cleansing Foam: Tube
-      2 => (60.0, 150.0),  // Essence: Dropper
-      3 => (70.0, 140.0),  // Ampoule: Bell
-      4 => (90.0, 110.0),  // Cleansing Balm/Jar: Wide short
-      5 => (65.0, 160.0),  // Serum: Pump
-      6 => (75.0, 170.0),  // Lotion: Wide Pump
-      7 => (55.0, 190.0),  // Mist: Slim tall spray
+      0 => (60.0, 180.0), // Toner/Skin: Tall slim
+      1 => (80.0, 160.0), // Cleansing Foam: Tube
+      2 => (60.0, 150.0), // Essence: Dropper
+      3 => (70.0, 140.0), // Ampoule: Bell
+      4 => (90.0, 110.0), // Cleansing Balm/Jar: Wide short
+      5 => (65.0, 160.0), // Serum: Pump
+      6 => (75.0, 170.0), // Lotion: Wide Pump
+      7 => (55.0, 190.0), // Mist: Slim tall spray
       _ => (60.0, 180.0),
     };
   }
@@ -1982,18 +2112,18 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
 
   List<Widget> _buildCategoryItems() {
     final list = <Widget>[];
-    
+
     // Left items
     for (int i = 0; i < _leftCategories.length; i++) {
       final y = (i - _scrollPosition) * 44.0;
       final distance = (i - _scrollPosition).abs();
       final opacity = (1.0 - (distance * 0.36)).clamp(0.0, 1.0);
       if (opacity <= 0.0) continue;
-      
+
       // The category closest to the horizontal center is dominant. Items
       // progressively shrink as they move away from that focal line.
       final scale = (1.34 - (distance * 0.20)).clamp(0.72, 1.34);
-      
+
       final cat = _leftCategories[i];
       final isSelected = selected.contains(cat);
       Color textColor;
@@ -2004,8 +2134,10 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       } else {
         textColor = WellLessColors.dim;
       }
-      final fontWeight = i == _selectedIndex ? FontWeight.w900 : FontWeight.w700;
-      
+      final fontWeight = i == _selectedIndex
+          ? FontWeight.w900
+          : FontWeight.w700;
+
       list.add(
         Positioned(
           right: 125.0 + getXOffset(y),
@@ -2052,9 +2184,9 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       final distance = (i - _scrollPosition).abs();
       final opacity = (1.0 - (distance * 0.36)).clamp(0.0, 1.0);
       if (opacity <= 0.0) continue;
-      
+
       final scale = (1.34 - (distance * 0.20)).clamp(0.72, 1.34);
-      
+
       final cat = _rightCategories[i];
       final isSelected = selected.contains(cat);
       Color textColor;
@@ -2065,8 +2197,10 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
       } else {
         textColor = WellLessColors.dim;
       }
-      final fontWeight = i == _selectedIndex ? FontWeight.w900 : FontWeight.w700;
-      
+      final fontWeight = i == _selectedIndex
+          ? FontWeight.w900
+          : FontWeight.w700;
+
       list.add(
         Positioned(
           left: 125.0 + getXOffset(y),
@@ -2113,7 +2247,11 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
   Widget build(BuildContext context) => FlowScaffold(
     title: '제품 등록',
     onBack: widget.onBack,
-    footer: PrimaryButton(label: '제품 등록하기 →', onPressed: widget.onContinue),
+    footer: PrimaryButton(
+      label: '제품 등록하기 →',
+      enabled: selected.isNotEmpty,
+      onPressed: () => widget.onContinue(selected.toList(growable: false)),
+    ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2128,17 +2266,21 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
           style: TextStyle(fontSize: 11, color: WellLessColors.dim),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 7,
-          runSpacing: 7,
-          children: selected
-              .map(
-                (item) => GestureDetector(
-                  onTap: () => setState(() => selected.remove(item)),
-                  child: SmallPill(item, active: true),
-                ),
-              )
-              .toList(),
+        SizedBox(
+          height: 28,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: selected.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 7),
+            itemBuilder: (context, index) {
+              final item = selected.elementAt(index);
+              return GestureDetector(
+                onTap: () => setState(() => selected.remove(item)),
+                child: SmallPill(item, active: true),
+              );
+            },
+          ),
         ),
         const SizedBox(height: 72),
         Center(
@@ -2157,12 +2299,13 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 250),
                       transitionBuilder: (child, animation) {
-                        final isIncoming = child.key == ValueKey(_selectedIndex);
+                        final isIncoming =
+                            child.key == ValueKey(_selectedIndex);
                         final translate = Tween<double>(
                           begin: isIncoming ? 4.0 : -4.0,
                           end: 0.0,
                         ).animate(animation);
-                        
+
                         return FadeTransition(
                           opacity: animation,
                           child: AnimatedBuilder(
@@ -2178,7 +2321,10 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
                       },
                       child: Container(
                         key: ValueKey(_selectedIndex),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: WellLessColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
@@ -2195,7 +2341,7 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
                       ),
                     ),
                   ),
-                  
+
                   // Product Silhouette Morph Switcher
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 350),
@@ -2205,16 +2351,31 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
                       final isIncoming = child.key == ValueKey(_selectedIndex);
                       if (isIncoming) {
                         final scale = TweenSequence<double>([
-                          TweenSequenceItem(tween: Tween<double>(begin: 0.88, end: 1.03).chain(CurveTween(curve: Curves.easeOut)), weight: 80),
-                          TweenSequenceItem(tween: Tween<double>(begin: 1.03, end: 1.0).chain(CurveTween(curve: Curves.easeIn)), weight: 20),
+                          TweenSequenceItem(
+                            tween: Tween<double>(
+                              begin: 0.88,
+                              end: 1.03,
+                            ).chain(CurveTween(curve: Curves.easeOut)),
+                            weight: 80,
+                          ),
+                          TweenSequenceItem(
+                            tween: Tween<double>(
+                              begin: 1.03,
+                              end: 1.0,
+                            ).chain(CurveTween(curve: Curves.easeIn)),
+                            weight: 20,
+                          ),
                         ]).animate(animation);
-                        
+
                         return FadeTransition(
                           opacity: animation,
                           child: ScaleTransition(scale: scale, child: child),
                         );
                       } else {
-                        final scale = Tween<double>(begin: 0.88, end: 1.0).animate(animation);
+                        final scale = Tween<double>(
+                          begin: 0.88,
+                          end: 1.0,
+                        ).animate(animation);
                         return FadeTransition(
                           opacity: animation,
                           child: ScaleTransition(scale: scale, child: child),
@@ -2223,7 +2384,7 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
                     },
                     child: _buildBottle(_selectedIndex),
                   ),
-                  
+
                   // Curved Carousel items
                   ..._buildCategoryItems(),
                 ],
@@ -2236,16 +2397,7 @@ class _CategoryScreenState extends State<CategoryScreen> with SingleTickerProvid
   );
 }
 
-const _leftCategories = [
-  '토너',
-  '스킨',
-  '에센스',
-  '앰플',
-  '오일',
-  '세럼',
-  '로션',
-  '미스트',
-];
+const _leftCategories = ['토너', '스킨', '에센스', '앰플', '오일', '세럼', '로션', '미스트'];
 
 const _rightCategories = [
   '클렌징젤',
@@ -2260,15 +2412,17 @@ const _rightCategories = [
 
 class ProductInputScreen extends StatelessWidget {
   const ProductInputScreen({
-    required this.productAdded,
+    required this.categories,
+    required this.capturedImages,
     required this.onBack,
     required this.onCamera,
     required this.onAnalyze,
     super.key,
   });
-  final bool productAdded;
+  final List<String> categories;
+  final Map<String, String> capturedImages;
   final VoidCallback onBack;
-  final VoidCallback onCamera;
+  final ValueChanged<String> onCamera;
   final VoidCallback onAnalyze;
 
   @override
@@ -2276,37 +2430,50 @@ class ProductInputScreen extends StatelessWidget {
     title: '제품 등록',
     onBack: onBack,
     trailing: Text(
-      '${productAdded ? 2 : 1}개 등록',
+      '${capturedImages.length}개 등록',
       style: const TextStyle(
         color: WellLessColors.primary,
         fontSize: 12,
         fontWeight: FontWeight.w700,
       ),
     ),
-    footer: PrimaryButton(label: 'AI 루틴 분석 →', onPressed: onAnalyze),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
-        const SectionEyebrow('토너', color: WellLessColors.text),
-        const SizedBox(height: 10),
-        const _RegisteredProduct(name: 'COSRX 어드밴스드 달팽이 72 에센스'),
-        const SizedBox(height: 8),
-        _PhotoInput(onTap: onCamera),
-        const SizedBox(height: 32),
-        const SectionEyebrow('에센스'),
-        const SizedBox(height: 10),
-        if (productAdded) const _RegisteredProduct(name: 'MISSHA 타임 레볼루션 앰플'),
-        if (productAdded) const SizedBox(height: 8),
-        _PhotoInput(onTap: onCamera),
-      ],
+    footer: PrimaryButton(
+      label: 'AI 루틴 분석 →',
+      enabled: capturedImages.isNotEmpty,
+      onPressed: onAnalyze,
+    ),
+    child: ListView.separated(
+      padding: const EdgeInsets.only(top: 12, bottom: 24),
+      itemCount: categories.length,
+      separatorBuilder: (_, _) => const SizedBox(height: 32),
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        final imagePath = capturedImages[category];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionEyebrow(category, color: WellLessColors.text),
+            if (imagePath != null) ...[
+              const SizedBox(height: 10),
+              _RegisteredProduct(
+                name: imagePath.split(RegExp(r'[/\\]')).last,
+                brand: 'AI 분석 전',
+              ),
+              const SizedBox(height: 8),
+            ] else
+              const SizedBox(height: 10),
+            _PhotoInput(onTap: () => onCamera(category)),
+          ],
+        );
+      },
     ),
   );
 }
 
 class _RegisteredProduct extends StatelessWidget {
-  const _RegisteredProduct({required this.name});
+  const _RegisteredProduct({required this.name, this.brand = '촬영 이미지'});
   final String name;
+  final String brand;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -2332,9 +2499,9 @@ class _RegisteredProduct extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(name, style: const TextStyle(fontSize: 12)),
-              const Text(
-                'COSRX',
-                style: TextStyle(fontSize: 9, color: WellLessColors.dim),
+              Text(
+                brand,
+                style: const TextStyle(fontSize: 9, color: WellLessColors.dim),
               ),
             ],
           ),
@@ -2570,35 +2737,77 @@ class _LoadingScreenState extends State<LoadingScreen>
     );
 
     _guideOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _revealController, curve: const Interval(0.0, 0.33, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _revealController,
+        curve: const Interval(0.0, 0.33, curve: Curves.easeOut),
+      ),
     );
     _guideTranslateY = Tween<double>(begin: 8.0, end: 0.0).animate(
-      CurvedAnimation(parent: _revealController, curve: const Interval(0.0, 0.33, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _revealController,
+        curve: const Interval(0.0, 0.33, curve: Curves.easeOut),
+      ),
     );
 
     _mainOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _revealController, curve: const Interval(0.18, 0.58, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _revealController,
+        curve: const Interval(0.18, 0.58, curve: Curves.easeOut),
+      ),
     );
     _mainTranslateY = Tween<double>(begin: 10.0, end: 0.0).animate(
-      CurvedAnimation(parent: _revealController, curve: const Interval(0.18, 0.58, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _revealController,
+        curve: const Interval(0.18, 0.58, curve: Curves.easeOut),
+      ),
     );
 
     _lineReveal = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _revealController, curve: const Interval(0.44, 0.76, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _revealController,
+        curve: const Interval(0.44, 0.76, curve: Curves.easeOut),
+      ),
     );
 
     _subtitleOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _revealController, curve: const Interval(0.66, 1.0, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _revealController,
+        curve: const Interval(0.66, 1.0, curve: Curves.easeOut),
+      ),
     );
 
     _lineBreath = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 0.96).chain(CurveTween(curve: Curves.easeInOut)), weight: 50),
-      TweenSequenceItem(tween: Tween<double>(begin: 0.96, end: 1.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 50),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 0.96,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 0.96,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
     ]).animate(_breathController);
 
     _subtitleBreath = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 0.85).chain(CurveTween(curve: Curves.easeInOut)), weight: 50),
-      TweenSequenceItem(tween: Tween<double>(begin: 0.85, end: 1.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 50),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 0.85,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 0.85,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
     ]).animate(_breathController);
 
     _revealController.forward().then((_) {
@@ -2640,14 +2849,17 @@ class _LoadingScreenState extends State<LoadingScreen>
                             opacity: _guideOpacity.value,
                             child: const Text(
                               '잠시만 기다려주세요.',
-                              style: TextStyle(color: WellLessColors.dim, fontSize: 14),
+                              style: TextStyle(
+                                color: WellLessColors.dim,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         );
                       },
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Main Title
                     AnimatedBuilder(
                       animation: _revealController,
@@ -2667,7 +2879,9 @@ class _LoadingScreenState extends State<LoadingScreen>
                                   TextSpan(text: '사용자님의 '),
                                   TextSpan(
                                     text: '루틴',
-                                    style: TextStyle(color: WellLessColors.primary),
+                                    style: TextStyle(
+                                      color: WellLessColors.primary,
+                                    ),
                                   ),
                                   TextSpan(text: '을 분석중입니다.'),
                                 ],
@@ -2681,9 +2895,14 @@ class _LoadingScreenState extends State<LoadingScreen>
 
                     // Underline red bar with breathing/drawing animation
                     AnimatedBuilder(
-                      animation: Listenable.merge([_revealController, _breathController]),
+                      animation: Listenable.merge([
+                        _revealController,
+                        _breathController,
+                      ]),
                       builder: (context, _) {
-                        final widthFactor = _breathController.isAnimating ? _lineBreath.value : _lineReveal.value;
+                        final widthFactor = _breathController.isAnimating
+                            ? _lineBreath.value
+                            : _lineReveal.value;
                         return Container(
                           width: 154,
                           height: 2,
@@ -2691,9 +2910,7 @@ class _LoadingScreenState extends State<LoadingScreen>
                           alignment: Alignment.centerLeft,
                           child: FractionallySizedBox(
                             widthFactor: widthFactor,
-                            child: Container(
-                              color: WellLessColors.primary,
-                            ),
+                            child: Container(color: WellLessColors.primary),
                           ),
                         );
                       },
@@ -2702,9 +2919,14 @@ class _LoadingScreenState extends State<LoadingScreen>
 
                     // Subtitle Text
                     AnimatedBuilder(
-                      animation: Listenable.merge([_revealController, _breathController]),
+                      animation: Listenable.merge([
+                        _revealController,
+                        _breathController,
+                      ]),
                       builder: (context, _) {
-                        final opacity = _breathController.isAnimating ? _subtitleBreath.value : _subtitleOpacity.value;
+                        final opacity = _breathController.isAnimating
+                            ? _subtitleBreath.value
+                            : _subtitleOpacity.value;
                         return Opacity(
                           opacity: opacity,
                           child: Text(
@@ -2757,20 +2979,32 @@ class _CosmeticBottlePainter extends CustomPainter {
         // Cap
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy - 60), width: 22, height: 16),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy - 60),
+              width: 22,
+              height: 16,
+            ),
             const Radius.circular(3),
           ),
           paint,
         );
         // Neck
         canvas.drawRect(
-          Rect.fromCenter(center: Offset(center.dx, center.dy - 46), width: 14, height: 12),
+          Rect.fromCenter(
+            center: Offset(center.dx, center.dy - 46),
+            width: 14,
+            height: 12,
+          ),
           paint,
         );
         // Body
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy + 15), width: 44, height: 110),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy + 15),
+              width: 44,
+              height: 110,
+            ),
             const Radius.circular(8),
           ),
           paint,
@@ -2781,7 +3015,11 @@ class _CosmeticBottlePainter extends CustomPainter {
         // Cap at the bottom
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy + 60), width: 34, height: 16),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy + 60),
+              width: 34,
+              height: 16,
+            ),
             const Radius.circular(2),
           ),
           paint,
@@ -2790,12 +3028,21 @@ class _CosmeticBottlePainter extends CustomPainter {
         final path = Path()
           ..moveTo(center.dx - 17, center.dy + 52) // cap connection left
           ..lineTo(center.dx - 28, center.dy - 60) // flare out to top left
-          ..quadraticBezierTo(center.dx, center.dy - 65, center.dx + 28, center.dy - 60) // top edge curve
+          ..quadraticBezierTo(
+            center.dx,
+            center.dy - 65,
+            center.dx + 28,
+            center.dy - 60,
+          ) // top edge curve
           ..lineTo(center.dx + 17, center.dy + 52) // cap connection right
           ..close();
         canvas.drawPath(path, paint);
         // Crimped edge detail at top
-        canvas.drawLine(Offset(center.dx - 28, center.dy - 56), Offset(center.dx + 28, center.dy - 56), paint);
+        canvas.drawLine(
+          Offset(center.dx - 28, center.dy - 56),
+          Offset(center.dx + 28, center.dy - 56),
+          paint,
+        );
         break;
 
       case 2: // Essence: Dropper bottle
@@ -2804,14 +3051,22 @@ class _CosmeticBottlePainter extends CustomPainter {
         // Bulb
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy - 54), width: 16, height: 18),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy - 54),
+              width: 16,
+              height: 18,
+            ),
             const Radius.circular(6),
           ),
           paint,
         );
         // Collar
         canvas.drawRect(
-          Rect.fromCenter(center: Offset(center.dx, center.dy - 40), width: 22, height: 10),
+          Rect.fromCenter(
+            center: Offset(center.dx, center.dy - 40),
+            width: 22,
+            height: 10,
+          ),
           paint,
         );
         // Body
@@ -2820,7 +3075,12 @@ class _CosmeticBottlePainter extends CustomPainter {
           final bodyPath = Path()
             ..moveTo(center.dx - 11, center.dy - 35)
             ..lineTo(center.dx - 26, center.dy + 50)
-            ..quadraticBezierTo(center.dx, center.dy + 55, center.dx + 26, center.dy + 50)
+            ..quadraticBezierTo(
+              center.dx,
+              center.dy + 55,
+              center.dx + 26,
+              center.dy + 50,
+            )
             ..lineTo(center.dx + 11, center.dy - 35)
             ..close();
           canvas.drawPath(bodyPath, paint);
@@ -2828,21 +3088,33 @@ class _CosmeticBottlePainter extends CustomPainter {
           // Oval cylinder
           canvas.drawRRect(
             RRect.fromRectAndRadius(
-              Rect.fromCenter(center: Offset(center.dx, center.dy + 10), width: 44, height: 90),
+              Rect.fromCenter(
+                center: Offset(center.dx, center.dy + 10),
+                width: 44,
+                height: 90,
+              ),
               const Radius.circular(12),
             ),
             paint,
           );
         }
         // Pipette line inside
-        canvas.drawLine(Offset(center.dx, center.dy - 35), Offset(center.dx, center.dy + 25), paint);
+        canvas.drawLine(
+          Offset(center.dx, center.dy - 35),
+          Offset(center.dx, center.dy + 25),
+          paint,
+        );
         break;
 
       case 4: // Balm / Jar: Short wide jar
         // Lid
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy - 20), width: 68, height: 14),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy - 20),
+              width: 68,
+              height: 14,
+            ),
             const Radius.circular(2),
           ),
           paint,
@@ -2850,7 +3122,11 @@ class _CosmeticBottlePainter extends CustomPainter {
         // Body
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy + 18), width: 70, height: 60),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy + 18),
+              width: 70,
+              height: 60,
+            ),
             const Radius.circular(6),
           ),
           paint,
@@ -2861,14 +3137,22 @@ class _CosmeticBottlePainter extends CustomPainter {
         // Body
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy + 15), width: 42, height: 110),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy + 15),
+              width: 42,
+              height: 110,
+            ),
             const Radius.circular(6),
           ),
           paint,
         );
         // Collar
         canvas.drawRect(
-          Rect.fromCenter(center: Offset(center.dx, center.dy - 45), width: 18, height: 10),
+          Rect.fromCenter(
+            center: Offset(center.dx, center.dy - 45),
+            width: 18,
+            height: 10,
+          ),
           paint,
         );
         // Pump head (L-shape nozzle)
@@ -2886,14 +3170,22 @@ class _CosmeticBottlePainter extends CustomPainter {
         // Body (wider rectangle)
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy + 15), width: 54, height: 100),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy + 15),
+              width: 54,
+              height: 100,
+            ),
             const Radius.circular(8),
           ),
           paint,
         );
         // Pump collar
         canvas.drawRect(
-          Rect.fromCenter(center: Offset(center.dx, center.dy - 40), width: 22, height: 10),
+          Rect.fromCenter(
+            center: Offset(center.dx, center.dy - 40),
+            width: 22,
+            height: 10,
+          ),
           paint,
         );
         // Large pump head nozzle
@@ -2911,26 +3203,42 @@ class _CosmeticBottlePainter extends CustomPainter {
         // Body
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy + 20), width: 36, height: 120),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy + 20),
+              width: 36,
+              height: 120,
+            ),
             const Radius.circular(6),
           ),
           paint,
         );
         // Collar / spray head
         canvas.drawRect(
-          Rect.fromCenter(center: Offset(center.dx, center.dy - 45), width: 14, height: 10),
+          Rect.fromCenter(
+            center: Offset(center.dx, center.dy - 45),
+            width: 14,
+            height: 10,
+          ),
           paint,
         );
         // Clear cap on top
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(center.dx, center.dy - 58), width: 18, height: 16),
+            Rect.fromCenter(
+              center: Offset(center.dx, center.dy - 58),
+              width: 18,
+              height: 16,
+            ),
             const Radius.circular(2),
           ),
           paint,
         );
         // Dip tube inside
-        canvas.drawLine(Offset(center.dx, center.dy - 40), Offset(center.dx, center.dy + 75), paint);
+        canvas.drawLine(
+          Offset(center.dx, center.dy - 40),
+          Offset(center.dx, center.dy + 75),
+          paint,
+        );
         break;
     }
   }

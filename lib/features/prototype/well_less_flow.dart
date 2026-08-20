@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:well_less_app/core/network/ai_analysis_service.dart';
+import 'package:well_less_app/core/network/well_less_api_service.dart';
 import 'package:well_less_app/core/theme/well_less_theme.dart';
 import 'package:well_less_app/features/prototype/ai_analysis.dart';
 import 'package:well_less_app/features/prototype/mock_data.dart';
@@ -36,11 +37,36 @@ class WellLessFlow extends StatefulWidget {
 class _WellLessFlowState extends State<WellLessFlow> {
   FlowStep _step = FlowStep.splashKorean;
   final List<FlowStep> _history = [];
-  bool _productAdded = false;
   bool _replacementSelected = false;
   final AiAnalysisService _aiAnalysisService = AiAnalysisService();
-  final List<String> _capturedImagePaths = [];
+  final WellLessApiService _apiService = WellLessApiService();
+  final Map<String, String> _capturedImages = {};
+  final Set<String> _uploadedImagePaths = {};
+  List<String> _selectedCategories = [];
+  WellLessSession? _session;
+  String? _routineId;
+  String? _captureCategory;
+  bool _creatingRoutine = false;
   AiRoutineAnalysis? _analysis;
+
+  static const _categoryCodes = <String, String>{
+    '클렌징젤': 'CLEANSING_FOAM_GEL',
+    '클렌징폼': 'CLEANSING_FOAM_GEL',
+    '클렌징티슈': 'CLEANSING_WATER_MILK',
+    '클렌징오일': 'CLEANSING_OIL_BALM',
+    '클렌징밤': 'CLEANSING_OIL_BALM',
+    '필링&스크럽': 'EXFOLIATOR',
+    '클렌징워터': 'CLEANSING_WATER_MILK',
+    '클렌징밀크': 'CLEANSING_WATER_MILK',
+    '스킨': 'SKIN_TONER',
+    '토너': 'SKIN_TONER',
+    '에센스': 'ESSENCE_SERUM_AMPOULE',
+    '세럼': 'ESSENCE_SERUM_AMPOULE',
+    '앰플': 'ESSENCE_SERUM_AMPOULE',
+    '로션': 'LOTION',
+    '미스트': 'MIST_OIL',
+    '오일': 'MIST_OIL',
+  };
 
   @override
   void initState() {
@@ -61,18 +87,84 @@ class _WellLessFlowState extends State<WellLessFlow> {
 
   void _replaceSelected() => setState(() => _replacementSelected = true);
 
-  Future<void> _startAnalysis() async {
-    if (_capturedImagePaths.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('AI 분석을 위해 제품 사진을 먼저 촬영해주세요.')),
+  Future<String?> _verifyPersonalCode(String personalCode) async {
+    try {
+      final session = await _apiService.verifyPersonalCode(personalCode);
+      if (!mounted) return '화면이 종료되었습니다. 다시 시도해주세요.';
+      setState(() => _session = session);
+      return null;
+    } on WellLessApiException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future<void> _prepareRoutine(List<String> categories) async {
+    if (_creatingRoutine) return;
+    final session = _session;
+    if (session == null) {
+      _showMessage('개인 코드 인증이 필요합니다.');
+      return;
+    }
+    final categoryCodes = categories
+        .map((category) => _categoryCodes[category])
+        .whereType<String>()
+        .toSet()
+        .toList(growable: false);
+    if (categoryCodes.isEmpty) {
+      _showMessage('카테고리를 한 개 이상 선택해주세요.');
+      return;
+    }
+
+    _creatingRoutine = true;
+    try {
+      final routineId = await _apiService.createRoutine(
+        session: session,
+        categoryCodes: categoryCodes,
       );
+      if (!mounted) return;
+      setState(() {
+        _selectedCategories = List.of(categories);
+        _capturedImages.clear();
+        _uploadedImagePaths.clear();
+        _routineId = routineId;
+      });
+      _go(FlowStep.productInput);
+    } on WellLessApiException catch (error) {
+      _showMessage(error.message);
+    } finally {
+      _creatingRoutine = false;
+    }
+  }
+
+  Future<void> _startAnalysis() async {
+    final session = _session;
+    final routineId = _routineId;
+    if (_capturedImages.isEmpty) {
+      _showMessage('AI 분석을 위해 제품 사진을 먼저 촬영해주세요.');
+      return;
+    }
+    if (session == null || routineId == null) {
+      _showMessage('루틴 세션이 없습니다. 카테고리 선택부터 다시 진행해주세요.');
       return;
     }
     _go(FlowStep.loading);
     try {
+      for (final entry in _capturedImages.entries) {
+        if (_uploadedImagePaths.contains(entry.value)) continue;
+        final categoryCode = _categoryCodes[entry.key];
+        if (categoryCode == null) continue;
+        await _apiService.uploadProductImage(
+          session: session,
+          routineId: routineId,
+          categoryCode: categoryCode,
+          imagePath: entry.value,
+        );
+        _uploadedImagePaths.add(entry.value);
+      }
       final analysis = await _aiAnalysisService.analyzeRoutine(
-        profileCode: 'O-S-P',
-        imagePaths: _capturedImagePaths,
+        accessToken: session.accessToken,
+        routineId: routineId,
+        imagePaths: _capturedImages.values.toList(growable: false),
       );
       if (!mounted) return;
       setState(() {
@@ -83,10 +175,18 @@ class _WellLessFlowState extends State<WellLessFlow> {
     } on AiAnalysisException catch (error) {
       if (!mounted) return;
       setState(() => _step = FlowStep.productInput);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message)),
-      );
+      _showMessage(error.message);
+    } on WellLessApiException catch (error) {
+      if (!mounted) return;
+      setState(() => _step = FlowStep.productInput);
+      _showMessage(error.message);
     }
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   int _getPageIndex(FlowStep step) {
@@ -122,7 +222,10 @@ class _WellLessFlowState extends State<WellLessFlow> {
         onComplete: () => setState(() => _step = FlowStep.code),
       ),
       FlowStep.splashBrand => const SizedBox.shrink(),
-      FlowStep.code => CodeScreen(onSuccess: () => _go(FlowStep.home)),
+      FlowStep.code => CodeScreen(
+        onSubmit: _verifyPersonalCode,
+        onSuccess: () => _go(FlowStep.home),
+      ),
       FlowStep.home => HomeScreen(
         onReport: () => _go(FlowStep.report),
         onHistory: () => _go(FlowStep.finalRoutine),
@@ -133,25 +236,31 @@ class _WellLessFlowState extends State<WellLessFlow> {
       ),
       FlowStep.category => CategoryScreen(
         onBack: _back,
-        onContinue: () => _go(FlowStep.productInput),
+        onContinue: _prepareRoutine,
       ),
       FlowStep.productInput => ProductInputScreen(
-        productAdded: _productAdded,
+        categories: _selectedCategories,
+        capturedImages: _capturedImages,
         onBack: _back,
-        onCamera: () => _go(FlowStep.camera),
+        onCamera: (category) {
+          _captureCategory = category;
+          _go(FlowStep.camera);
+        },
         onAnalyze: _startAnalysis,
       ),
       FlowStep.camera => CameraScreen(
         onCancel: _back,
         onCapture: (path) {
-          _capturedImagePaths.add(path);
-          _productAdded = _capturedImagePaths.isNotEmpty;
+          final category = _captureCategory;
+          if (category != null) {
+            final previousPath = _capturedImages[category];
+            if (previousPath != null) _uploadedImagePaths.remove(previousPath);
+            _capturedImages[category] = path;
+          }
           _back();
         },
       ),
-      FlowStep.loading => LoadingScreen(
-        onComplete: () {},
-      ),
+      FlowStep.loading => LoadingScreen(onComplete: () {}),
       FlowStep.routine => RoutineScreen(
         onBack: _back,
         onAnalyze: () => _go(FlowStep.suitability),
@@ -222,10 +331,7 @@ class _WellLessFlowState extends State<WellLessFlow> {
 }
 
 class WellLessPageIndicator extends StatelessWidget {
-  const WellLessPageIndicator({
-    required this.activeIndex,
-    super.key,
-  });
+  const WellLessPageIndicator({required this.activeIndex, super.key});
 
   final int activeIndex;
 

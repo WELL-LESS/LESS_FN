@@ -9,7 +9,8 @@ class AiAnalysisService {
   final ApiClient _apiClient;
 
   Future<AiRoutineAnalysis> analyzeRoutine({
-    required String profileCode,
+    required String accessToken,
+    required String routineId,
     required List<String> imagePaths,
   }) async {
     if (imagePaths.isEmpty) {
@@ -18,18 +19,26 @@ class AiAnalysisService {
 
     try {
       final files = <MultipartFile>[];
-      for (final path in imagePaths.take(3)) {
+      for (final path in imagePaths.take(10)) {
+        final lowerPath = path.toLowerCase();
+        final contentType = lowerPath.endsWith('.png')
+            ? DioMediaType('image', 'png')
+            : lowerPath.endsWith('.webp')
+            ? DioMediaType('image', 'webp')
+            : DioMediaType('image', 'jpeg');
         files.add(
           await MultipartFile.fromFile(
             path,
             filename: path.split(RegExp(r'[/\\]')).last,
+            contentType: contentType,
           ),
         );
       }
       final response = await _apiClient.dio.post<Map<String, dynamic>>(
         '/ai/analyze-routine',
-        data: FormData.fromMap({'profile_code': profileCode, 'images': files}),
+        data: FormData.fromMap({'routine_id': routineId, 'images': files}),
         options: Options(
+          headers: {'Authorization': 'Bearer $accessToken'},
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(minutes: 3),
         ),
@@ -41,10 +50,18 @@ class AiAnalysisService {
       return AiRoutineAnalysis.fromJson(payload);
     } on DioException catch (error) {
       final body = error.response?.data;
-      final message = body is Map<String, dynamic>
-          ? ((body['error'] as Map<String, dynamic>?)?['message'] as String?)
-          : null;
-      throw AiAnalysisException(message ?? 'AI 분석 서버에 연결하지 못했습니다.');
+      String? serverMessage;
+      if (body is Map) {
+        final serverError = body['error'];
+        if (serverError is Map) {
+          serverMessage = serverError['message']?.toString();
+        }
+        serverMessage ??= body['detail']?.toString();
+      }
+      final fallback = error.response == null
+          ? 'AI 분석 서버에 연결하지 못했습니다. 네트워크와 API 주소를 확인해주세요.'
+          : 'AI 분석 요청에 실패했습니다. (HTTP ${error.response?.statusCode})';
+      throw AiAnalysisException(serverMessage ?? fallback);
     }
   }
 }

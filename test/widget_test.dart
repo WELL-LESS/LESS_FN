@@ -38,6 +38,35 @@ void main() {
     expect(find.text('DSP'), findsOneWidget);
   });
 
+  testWidgets('selected category chips do not move the center carousel', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(370, 824));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: WellLessTheme.dark,
+        home: CategoryScreen(onBack: () {}, onContinue: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final centerLabel = find.text('오일 / 클렌징밤');
+    final before = tester.getCenter(centerLabel).dy;
+    final oilPicker = find.ancestor(
+      of: find.text('오일'),
+      matching: find.byType(GestureDetector),
+    );
+    tester.widget<GestureDetector>(oilPicker.first).onTap!.call();
+    await tester.pumpAndSettle();
+    final after = tester.getCenter(centerLabel).dy;
+
+    expect(after, before);
+    expect(find.text('오일'), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('AAC replacement selects in place and opens comparison', (
     tester,
   ) async {
