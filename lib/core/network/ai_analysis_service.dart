@@ -11,6 +11,7 @@ class AiAnalysisService {
   Future<AiRoutineAnalysis> analyzeRoutine({
     required String accessToken,
     required String routineId,
+    required String profileCode,
     required List<String> imagePaths,
   }) async {
     if (imagePaths.isEmpty) {
@@ -36,7 +37,11 @@ class AiAnalysisService {
       }
       final response = await _apiClient.dio.post<Map<String, dynamic>>(
         '/ai/analyze-routine',
-        data: FormData.fromMap({'routine_id': routineId, 'images': files}),
+        data: FormData.fromMap({
+          'routine_id': routineId,
+          'profile_code': profileCode,
+          'images': files,
+        }),
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
           sendTimeout: const Duration(seconds: 30),

@@ -164,6 +164,7 @@ class _WellLessFlowState extends State<WellLessFlow> {
       final analysis = await _aiAnalysisService.analyzeRoutine(
         accessToken: session.accessToken,
         routineId: routineId,
+        profileCode: session.skinTypeCode,
         imagePaths: _capturedImages.values.toList(growable: false),
       );
       if (!mounted) return;
