@@ -5,6 +5,23 @@ import 'package:well_less_app/features/prototype/ai_analysis.dart';
 import 'package:well_less_app/features/prototype/mock_data.dart';
 import 'package:well_less_app/features/prototype/widgets.dart';
 
+const _fallbackSuitabilityProducts = <AiAnalyzedProduct>[
+  AiAnalyzedProduct(
+    name: "Paula's Choice BHA 2%",
+    category: '세럼',
+    description: '고농도 살리실산이 민감 피부에 자극을 줄 수 있습니다.',
+    score: 22,
+    ingredients: ['살리실산', '에탄올', '메틸파라벤', '향료'],
+  ),
+  AiAnalyzedProduct(
+    name: 'The Ordinary 나이아신아마이드 10%',
+    category: '세럼',
+    description: '동일 단계의 기능성 제품이 중복됩니다.',
+    score: 22,
+    ingredients: ['나이아신아마이드', '징크 PCA'],
+  ),
+];
+
 class RoutineScreen extends StatefulWidget {
   const RoutineScreen({
     required this.onBack,
@@ -21,7 +38,8 @@ class RoutineScreen extends StatefulWidget {
   State<RoutineScreen> createState() => _RoutineScreenState();
 }
 
-class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProviderStateMixin {
+class _RoutineScreenState extends State<RoutineScreen>
+    with SingleTickerProviderStateMixin {
   late final List<RoutineProduct> _items;
   late final AnimationController _entranceController;
 
@@ -81,7 +99,9 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
           const SizedBox(height: 10),
           Expanded(
             child: SingleChildScrollView(
-              physics: _draggingIndex != null ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+              physics: _draggingIndex != null
+                  ? const NeverScrollableScrollPhysics()
+                  : const BouncingScrollPhysics(),
               child: AnimatedBuilder(
                 animation: _entranceController,
                 builder: (context, _) {
@@ -91,7 +111,7 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
                       children: [
                         // Serpentine items
                         for (int i = 0; i < _items.length; i++) _buildItem(i),
-                        
+
                         // Footer label
                         Positioned(
                           left: 0,
@@ -101,11 +121,10 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
                             child: AnimatedBuilder(
                               animation: _entranceController,
                               builder: (context, child) {
-                                final prog = _getEntranceProgress(_items.length);
-                                return Opacity(
-                                  opacity: prog,
-                                  child: child,
+                                final prog = _getEntranceProgress(
+                                  _items.length,
                                 );
+                                return Opacity(opacity: prog, child: child);
                               },
                               child: const Text(
                                 'ROUTINE END',
@@ -135,11 +154,11 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
     final isDragging = (_draggingIndex == index);
     final active = _activeProductNames.contains(product.name);
     final left = index.isEven;
-    
+
     // Staggered values
     final prog = _getEntranceProgress(index);
     final isStaged = prog > 0.0;
-    
+
     double scale = 1.0;
     if (!isDragging) {
       if (prog < 0.75) {
@@ -150,11 +169,11 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
     } else {
       scale = 1.04;
     }
-    
+
     final opacity = isDragging ? 1.0 : prog;
     final double baseTop = index * 108.0;
     final double currentTop = baseTop + (isDragging ? _dragOffset : 0.0);
-    
+
     final card = GestureDetector(
       onTap: () {
         setState(() {
@@ -175,7 +194,10 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
         setState(() {
           _dragOffset += details.delta.dy;
           final newY = index * 108.0 + _dragOffset;
-          final targetIndex = (newY / 108.0).round().clamp(0, _items.length - 1);
+          final targetIndex = (newY / 108.0).round().clamp(
+            0,
+            _items.length - 1,
+          );
           if (targetIndex != _draggingIndex) {
             final item = _items.removeAt(_draggingIndex!);
             _items.insert(targetIndex, item);
@@ -199,7 +221,9 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
               ? WellLessColors.primary.withValues(alpha: 0.07)
               : WellLessColors.surface,
           border: Border.all(
-            color: active ? WellLessColors.primary : (isDragging ? Colors.white : WellLessColors.border),
+            color: active
+                ? WellLessColors.primary
+                : (isDragging ? Colors.white : WellLessColors.border),
           ),
           borderRadius: BorderRadius.circular(4),
           boxShadow: isDragging
@@ -208,12 +232,14 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
                     color: Colors.black.withValues(alpha: 0.4),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ]
               : null,
         ),
         child: Column(
-          crossAxisAlignment: left ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: left
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             Text(
               product.name,
@@ -274,7 +300,9 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: SvgPicture.asset(
-              left ? 'assets/icons/routine_left.svg' : 'assets/icons/routine_right.svg',
+              left
+                  ? 'assets/icons/routine_left.svg'
+                  : 'assets/icons/routine_right.svg',
               key: ValueKey(left),
               width: 48,
               height: 45,
@@ -304,12 +332,8 @@ class _RoutineScreenState extends State<RoutineScreen> with SingleTickerProvider
                   clipBehavior: Clip.none,
                   children: [
                     // Node circle in the center
-                    Positioned(
-                      left: centerX - 24,
-                      top: 0,
-                      child: numberNode,
-                    ),
-                    
+                    Positioned(left: centerX - 24, top: 0, child: numberNode),
+
                     // Card sliding horizontally
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 350),
@@ -350,15 +374,15 @@ class SuitabilityScreen extends StatefulWidget {
   State<SuitabilityScreen> createState() => _SuitabilityScreenState();
 }
 
-class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProviderStateMixin {
+class _SuitabilityScreenState extends State<SuitabilityScreen>
+    with TickerProviderStateMixin {
   bool _comparisonVisible = false;
-  bool _removedFirst = false;
-  bool _removedSecond = false;
+  final Set<int> _removedProductIndexes = <int>{};
+  int? _replacementProductIndex;
 
   late final AnimationController _entranceController;
   late final AnimationController _comparisonController;
 
-  late final Animation<double> _orbProgress;
   late final Animation<double> _badgeProgress;
   late final Animation<double> _removeTitleProgress;
   late final Animation<double> _card1Progress;
@@ -377,24 +401,35 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
       duration: const Duration(milliseconds: 300),
     );
 
-    final targetScore = (widget.analysis?.overallScore ?? 68) / 100;
-    _orbProgress = Tween<double>(begin: 0.0, end: targetScore).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.55, curve: Curves.easeOut)),
-    );
     _badgeProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.5, 0.68, curve: Curves.easeOutBack)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.5, 0.68, curve: Curves.easeOutBack),
+      ),
     );
     _removeTitleProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.55, 0.70, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.55, 0.70, curve: Curves.easeOut),
+      ),
     );
     _card1Progress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.65, 0.82, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.65, 0.82, curve: Curves.easeOut),
+      ),
     );
     _card2Progress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.75, 0.92, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.75, 0.92, curve: Curves.easeOut),
+      ),
     );
     _ctaProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.85, 1.0, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.85, 1.0, curve: Curves.easeOut),
+      ),
     );
 
     _entranceController.forward();
@@ -407,16 +442,54 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
     super.dispose();
   }
 
-  void _triggerRemoveFirst() => setState(() => _removedFirst = true);
+  int get _currentRoutineScore {
+    if (_replacementProductIndex != null) {
+      return (75 + (_removedProductIndexes.length * 2)).clamp(0, 100);
+    }
+    final reportedScore = widget.analysis?.overallScore ?? 0;
+    final baseScore = reportedScore > 0 ? reportedScore : 68;
+    return (baseScore + (_removedProductIndexes.length * 4)).clamp(0, 100);
+  }
 
-  void _triggerRemoveSecond() => setState(() => _removedSecond = true);
+  void _toggleRemove(int index) {
+    setState(() {
+      if (!_removedProductIndexes.add(index)) {
+        _removedProductIndexes.remove(index);
+      } else if (_replacementProductIndex == index) {
+        _replacementProductIndex = null;
+      }
+    });
+  }
+
+  void _selectReplacement(int index) {
+    if (!widget.replacementSelected) widget.onReplacement();
+    setState(() {
+      _removedProductIndexes.remove(index);
+      _replacementProductIndex = index;
+      _comparisonVisible = true;
+      _comparisonController.forward(from: 0.0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final removeCandidates = widget.analysis?.removeCandidates ?? const [];
-    final firstCandidate = removeCandidates.isEmpty ? null : removeCandidates.first;
-    final analyzedProducts = widget.analysis?.products ?? const [];
-    final firstProduct = analyzedProducts.isEmpty ? null : analyzedProducts.first;
+    final sourceProducts = widget.analysis?.products.isNotEmpty == true
+        ? widget.analysis!.products
+        : _fallbackSuitabilityProducts;
+    const suitabilityOrder = <String, int>{
+      '독도 토너': 0,
+      '자작나무 수분 로션': 1,
+      '제주 알로에 수딩젤': 2,
+      '메노킨 선크림': 3,
+      '달바 화이트 트러플 엑소 인텐시브 세럼': 4,
+    };
+    final analyzedProducts = List<AiAnalyzedProduct>.of(sourceProducts)
+      ..sort(
+        (left, right) => (suitabilityOrder[left.name] ?? 99).compareTo(
+          suitabilityOrder[right.name] ?? 99,
+        ),
+      );
     return FlowScaffold(
       title: '피부 적합도 분석 결과',
       onBack: widget.onBack,
@@ -431,30 +504,42 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
             ),
           );
         },
-        child: PrimaryButton(label: '최종 루틴 확인하러 가기 →', onPressed: widget.onFinal),
+        child: PrimaryButton(
+          label: '최종 루틴 확인하러 가기 →',
+          onPressed: widget.onFinal,
+        ),
       ),
       scrollable: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
-          
+
           // Header / Score Summary
-          AnimatedBuilder(
-            animation: _entranceController,
-            builder: (context, _) => _ScoreSummary(
-              orbProgress: _orbProgress.value,
-              badgeProgress: _badgeProgress.value,
-              entranceController: _entranceController,
-              productCount: analyzedProducts.isEmpty ? 8 : analyzedProducts.length,
-              unsuitableCount: widget.analysis == null ? 2 : removeCandidates.length,
-              summary: widget.analysis?.summary,
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOutCubic,
+            tween: Tween<double>(end: _currentRoutineScore / 100),
+            builder: (context, scoreProgress, _) => AnimatedBuilder(
+              animation: _entranceController,
+              builder: (context, _) => _ScoreSummary(
+                orbProgress: scoreProgress,
+                badgeProgress: _badgeProgress.value,
+                entranceController: _entranceController,
+                productCount: analyzedProducts.isEmpty
+                    ? 5
+                    : analyzedProducts.length,
+                unsuitableCount: widget.analysis == null
+                    ? 2
+                    : removeCandidates.length,
+                summary: widget.analysis?.summary,
+              ),
             ),
           ),
           const SizedBox(height: 28),
           const Divider(height: 1, color: WellLessColors.border),
           const SizedBox(height: 16),
-          
+
           // REMOVE Title Banner
           AnimatedBuilder(
             animation: _entranceController,
@@ -468,7 +553,10 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
                     padding: const EdgeInsets.only(left: 12, bottom: 2),
                     decoration: const BoxDecoration(
                       border: Border(
-                        left: BorderSide(color: WellLessColors.primary, width: 3),
+                        left: BorderSide(
+                          color: WellLessColors.primary,
+                          width: 3,
+                        ),
                       ),
                     ),
                     child: Column(
@@ -486,7 +574,10 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
                         const SizedBox(height: 3),
                         const Text(
                           '아래 항목들은 덜어내는 것을 권장드립니다.',
-                          style: TextStyle(fontSize: 10, color: WellLessColors.dim),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: WellLessColors.dim,
+                          ),
                         ),
                       ],
                     ),
@@ -496,49 +587,16 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
             },
           ),
           const SizedBox(height: 12),
-          
+
           // Global comparison panel removed to favor inline card expansion
-            
-          // Product Card 1
-          AnimatedBuilder(
-            animation: _entranceController,
-            builder: (context, _) {
-              final val = _card1Progress.value;
-              return Opacity(
-                opacity: val,
-                child: Transform.translate(
-                  offset: Offset(0.0, (1.0 - val) * 12.0),
-                  child: Transform.scale(
-                    scale: 0.97 + val * 0.03,
-                    child: _RemoveProductCard(
-                      selectedReplacement: widget.replacementSelected,
-                      removed: _removedFirst,
-                      onRemove: _triggerRemoveFirst,
-                      onReplace: () {
-                        if (!widget.replacementSelected) widget.onReplacement();
-                        setState(() {
-                          _comparisonVisible = true;
-                          _comparisonController.forward(from: 0.0);
-                        });
-                      },
-                      cardProgress: val,
-                      productName: firstCandidate?.product ?? firstProduct?.name,
-                      score: firstProduct?.score,
-                      reason: firstCandidate?.reason ?? firstProduct?.description,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 14),
-          
-          // Product Card 2
-          if (widget.analysis == null || removeCandidates.length > 1)
+          for (var index = 0; index < analyzedProducts.length; index++) ...[
             AnimatedBuilder(
               animation: _entranceController,
               builder: (context, _) {
-                final val = _card2Progress.value;
+                final val = index == 0
+                    ? _card1Progress.value
+                    : _card2Progress.value;
+                final product = analyzedProducts[index];
                 return Opacity(
                   opacity: val,
                   child: Transform.translate(
@@ -546,22 +604,24 @@ class _SuitabilityScreenState extends State<SuitabilityScreen> with TickerProvid
                     child: Transform.scale(
                       scale: 0.97 + val * 0.03,
                       child: _RemoveProductCard(
-                        removed: _removedSecond,
-                        onRemove: _triggerRemoveSecond,
-                        onReplace: () {
-                          if (!widget.replacementSelected) widget.onReplacement();
-                          setState(() {
-                            _comparisonVisible = true;
-                            _comparisonController.forward(from: 0.0);
-                          });
-                        },
+                        selectedReplacement: _replacementProductIndex == index,
+                        removed: _removedProductIndexes.contains(index),
+                        onRemove: () => _toggleRemove(index),
+                        onReplace: () => _selectReplacement(index),
                         cardProgress: val,
+                        productName: product.name,
+                        category: product.category,
+                        score: product.score,
+                        reason: product.description,
+                        ingredients: product.ingredients,
                       ),
                     ),
                   ),
                 );
               },
             ),
+            const SizedBox(height: 14),
+          ],
         ],
       ),
     );
@@ -588,7 +648,7 @@ class _ScoreSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final countVal = (orbProgress * 100).round();
-    
+
     double scoreScale = 1.0;
     if (entranceController.value >= 0.55) {
       final popVal = ((entranceController.value - 0.55) / 0.1).clamp(0.0, 1.0);
@@ -637,9 +697,12 @@ class _ScoreSummary extends StatelessWidget {
                   ),
                 ),
               ),
-              const Text(
-                '8개 제품 중 2개 부적합',
-                style: TextStyle(fontSize: 11, color: WellLessColors.faint),
+              Text(
+                '$productCount개 제품 중 $unsuitableCount개 부적합',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: WellLessColors.faint,
+                ),
               ),
               const SizedBox(height: 7),
               Opacity(
@@ -737,8 +800,10 @@ class _RemoveProductCard extends StatefulWidget {
     this.removed = false,
     required this.cardProgress,
     this.productName,
+    this.category,
     this.score,
     this.reason,
+    this.ingredients = const [],
   });
 
   final VoidCallback onRemove;
@@ -747,8 +812,10 @@ class _RemoveProductCard extends StatefulWidget {
   final bool removed;
   final double cardProgress;
   final String? productName;
+  final String? category;
   final int? score;
   final String? reason;
+  final List<String> ingredients;
 
   @override
   State<_RemoveProductCard> createState() => _RemoveProductCardState();
@@ -784,12 +851,15 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
     final selectedColor = widget.selectedReplacement
         ? WellLessColors.success
         : WellLessColors.primary;
-        
+
     // Score count-up logic
     final double innerVal = widget.cardProgress;
-    final scoreValue = widget.selectedReplacement ? 86 : (widget.score ?? 22);
+    final scoreValue = widget.selectedReplacement ? 75 : (widget.score ?? 0);
     final scoreCount = (innerVal * scoreValue).round();
-    
+    final scoreLabel = !widget.selectedReplacement && scoreValue <= 0
+        ? 'X'
+        : '$scoreCount';
+
     // Scale pop for scores
     double scoreScale = 1.0;
     if (innerVal >= 0.8) {
@@ -841,54 +911,74 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                                   child: AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 300),
                                     transitionBuilder: (child, animation) {
-                                      final isIncoming = child.key == ValueKey(widget.selectedReplacement);
+                                      final isIncoming =
+                                          child.key ==
+                                          ValueKey(widget.selectedReplacement);
                                       return SlideTransition(
                                         position: Tween<Offset>(
-                                          begin: Offset(0.0, isIncoming ? 0.05 : -0.05),
+                                          begin: Offset(
+                                            0.0,
+                                            isIncoming ? 0.05 : -0.05,
+                                          ),
                                           end: Offset.zero,
                                         ).animate(animation),
-                                        child: FadeTransition(opacity: animation, child: child),
+                                        child: FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        ),
                                       );
                                     },
                                     child: widget.selectedReplacement
                                         ? Column(
                                             key: const ValueKey(true),
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               const Text(
-                                                "AAC 세이프 BHA 세럼",
+                                                '바바코 스노우 빙하수 에센스 토너',
                                                 style: TextStyle(fontSize: 13),
                                               ),
                                               const SizedBox(height: 2),
-                                              SmallPill('세럼', active: true, green: true),
+                                              SmallPill(
+                                                '토너',
+                                                active: true,
+                                                green: true,
+                                              ),
                                             ],
                                           )
                                         : Column(
                                             key: const ValueKey(false),
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                widget.productName ?? "Paula's Choice BHA 2%",
-                                                style: const TextStyle(fontSize: 13),
+                                                widget.productName ??
+                                                    "Paula's Choice BHA 2%",
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                ),
                                               ),
                                               const SizedBox(height: 2),
-                                              const SmallPill('세럼'),
+                                              SmallPill(
+                                                widget.category ?? '스킨케어',
+                                              ),
                                             ],
                                           ),
                                   ),
                                 ),
                               ),
-                              
+
                               // 3. Score count-up and scale pop
                               Opacity(
                                 opacity: (innerVal - 0.45).clamp(0.0, 1.0),
                                 child: Transform.scale(
                                   scale: scoreScale,
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '$scoreCount',
+                                        scoreLabel,
                                         style: scoreNumber(
                                           size: 36,
                                           color: selectedColor,
@@ -899,7 +989,8 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                                         style: condensed(
                                           size: 11,
                                           color: widget.selectedReplacement
-                                              ? WellLessColors.success.withValues(alpha: 0.5)
+                                              ? WellLessColors.success
+                                                    .withValues(alpha: 0.5)
                                               : const Color(0xFF7A241C),
                                         ),
                                       ),
@@ -910,7 +1001,7 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          
+
                           // 4. Description reveal
                           Opacity(
                             opacity: (innerVal - 0.55).clamp(0.0, 1.0),
@@ -918,46 +1009,66 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                               duration: const Duration(milliseconds: 300),
                               child: widget.selectedReplacement
                                   ? const Text(
-                                      '유기유황성분이 사용자의 민감성을 회복하도록 도와주며,\n피부 장벽 복구 확률이 높습니다.',
+                                      '피부결 정돈 · 수분 공급 · 피부톤 관리',
                                       key: ValueKey(true),
-                                      style: TextStyle(fontSize: 10, height: 1.55),
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        height: 1.55,
+                                      ),
                                     )
-                                  : const Text(
-                                      '고농도 살리실산이 사용자의 민감성을 더욱 극대화 하여,\n피부 장벽 손상 확률이 높습니다.',
-                                      key: ValueKey(false),
-                                      style: TextStyle(fontSize: 10, height: 1.55),
+                                  : Text(
+                                      widget.reason ?? '피부 적합도 분석 결과입니다.',
+                                      key: const ValueKey(false),
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        height: 1.55,
+                                      ),
                                     ),
                             ),
                           ),
                           const SizedBox(height: 8),
-                          
+
                           // 5. Tags reveal
                           Opacity(
                             opacity: (innerVal - 0.65).clamp(0.0, 1.0),
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
                               child: widget.selectedReplacement
-                                  ? Wrap(
+                                  ? const Wrap(
                                       key: const ValueKey(true),
                                       spacing: 5,
                                       runSpacing: 5,
                                       children: [
-                                        SmallPill('유기유황 0.5%', active: true, green: true),
-                                        const SmallPill('히알루론산'),
-                                        const SmallPill('병풀 추출물'),
-                                        const SmallPill('판테놀'),
+                                        SmallPill(
+                                          '아이슬란드 빙하수',
+                                          active: true,
+                                          green: true,
+                                        ),
+                                        SmallPill('알란토인'),
+                                        SmallPill('코직산'),
+                                        SmallPill('보습 캡슐'),
                                       ],
                                     )
-                                  : const Wrap(
+                                  : Wrap(
                                       key: const ValueKey(false),
                                       spacing: 5,
                                       runSpacing: 5,
-                                      children: [
-                                        SmallPill('살리실산', active: true),
-                                        SmallPill('에탄올'),
-                                        SmallPill('메틸파라벤'),
-                                        SmallPill('향료'),
-                                      ],
+                                      children: widget.ingredients.isEmpty
+                                          ? const [
+                                              SmallPill('측정불가', active: true),
+                                            ]
+                                          : widget.ingredients
+                                                .map(
+                                                  (ingredient) => SmallPill(
+                                                    ingredient,
+                                                    active:
+                                                        ingredient ==
+                                                        widget
+                                                            .ingredients
+                                                            .first,
+                                                  ),
+                                                )
+                                                .toList(growable: false),
                                     ),
                             ),
                           ),
@@ -967,7 +1078,7 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                   ],
                 ),
               ),
-              
+
               // 6. Action buttons reveal
               Opacity(
                 opacity: (innerVal - 0.75).clamp(0.0, 1.0),
@@ -983,7 +1094,9 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                     ),
                     Expanded(
                       child: _DecisionButton(
-                        label: widget.selectedReplacement ? '✓ AAC 교체' : '↻ AAC 교체',
+                        label: widget.selectedReplacement
+                            ? '✓ AAC 교체'
+                            : '↻ AAC 교체',
                         active: widget.selectedReplacement,
                         color: WellLessColors.success,
                         onTap: widget.onReplace,
@@ -1000,6 +1113,9 @@ class _RemoveProductCardState extends State<_RemoveProductCard> {
                 child: _expanded
                     ? _IngredientComparison(
                         onClose: () => setState(() => _expanded = false),
+                        productName: widget.productName ?? '기존 제품',
+                        score: widget.score,
+                        ingredients: widget.ingredients,
                       )
                     : const SizedBox.shrink(),
               ),
@@ -1048,8 +1164,16 @@ class _DecisionButton extends StatelessWidget {
 }
 
 class _IngredientComparison extends StatelessWidget {
-  const _IngredientComparison({required this.onClose});
+  const _IngredientComparison({
+    required this.onClose,
+    required this.productName,
+    required this.score,
+    required this.ingredients,
+  });
   final VoidCallback onClose;
+  final String productName;
+  final int? score;
+  final List<String> ingredients;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -1090,7 +1214,14 @@ class _IngredientComparison extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Expanded(child: _ComparisonColumn(existing: true)),
+              Expanded(
+                child: _ComparisonColumn(
+                  existing: true,
+                  productName: productName,
+                  score: score,
+                  ingredients: ingredients,
+                ),
+              ),
               Container(width: 1, height: 175, color: WellLessColors.border),
               const Expanded(child: _ComparisonColumn(existing: false)),
             ],
@@ -1102,15 +1233,31 @@ class _IngredientComparison extends StatelessWidget {
 }
 
 class _ComparisonColumn extends StatelessWidget {
-  const _ComparisonColumn({required this.existing});
+  const _ComparisonColumn({
+    required this.existing,
+    this.productName,
+    this.score,
+    this.ingredients = const [],
+  });
   final bool existing;
+  final String? productName;
+  final int? score;
+  final List<String> ingredients;
 
   @override
   Widget build(BuildContext context) {
     final color = existing ? WellLessColors.primary : WellLessColors.success;
     final items = existing
-        ? ['× 살리실산 2% (고농도)', '× 에탄올 (자극)', '× 메틸파라벤', '× 향료 (알레르기)']
-        : ['✓ 살리실산 0.5% (저자극)', '✓ 히알루론산', '✓ 병풀 추출물 (진정)', '✓ 판테놀 (장벽 강화)'];
+        ? (ingredients.isEmpty
+              ? const ['× 성분 정보 없음', '× 적합도 측정불가']
+              : ingredients.map((item) => '• $item').toList(growable: false))
+        : const [
+            '✓ 아이슬란드 빙하수',
+            '✓ 알란토인',
+            '✓ 코직산',
+            '✓ 보습 캡슐',
+            '피부결 정돈 · 수분 공급 · 피부톤 관리',
+          ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -1125,12 +1272,14 @@ class _ComparisonColumn extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            existing ? "Paula's Choice BHA 2%" : 'AAC 세이프 BHA 세럼',
+            existing ? (productName ?? '기존 제품') : '바바코 스노우 빙하수 에센스 토너',
             style: const TextStyle(fontSize: 11),
           ),
           const SizedBox(height: 8),
           Text(
-            existing ? '22/100' : '86/100',
+            existing
+                ? ((score ?? 0) <= 0 ? 'X' : '${score ?? 0}/100')
+                : '75/100',
             style: scoreNumber(size: 32, color: color),
           ),
           const SizedBox(height: 8),

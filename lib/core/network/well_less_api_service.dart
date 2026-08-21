@@ -83,7 +83,7 @@ class WellLessApiService {
     }
   }
 
-  Future<void> uploadProductImage({
+  Future<String> uploadProductImage({
     required WellLessSession session,
     required String routineId,
     required String categoryCode,
@@ -106,9 +106,29 @@ class WellLessApiService {
           contentType: contentType,
         ),
       });
-      await _dio.post<Map<String, dynamic>>(
+      final response = await _dio.post<Map<String, dynamic>>(
         '/routines/$routineId/product-inputs',
         data: form,
+        options: _authorized(session.accessToken),
+      );
+      final inputId = _responseData(response.data)['id']?.toString();
+      if (inputId == null || inputId.isEmpty) {
+        throw const WellLessApiException('제품 이미지 저장 결과를 확인할 수 없습니다.');
+      }
+      return inputId;
+    } on DioException catch (error) {
+      throw WellLessApiException(_errorMessage(error));
+    }
+  }
+
+  Future<void> deleteProductInput({
+    required WellLessSession session,
+    required String routineId,
+    required String inputId,
+  }) async {
+    try {
+      await _dio.delete<void>(
+        '/routines/$routineId/product-inputs/$inputId',
         options: _authorized(session.accessToken),
       );
     } on DioException catch (error) {

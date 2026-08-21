@@ -67,6 +67,46 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('multiple products can be registered and removed per category', (
+    tester,
+  ) async {
+    String? removedCategory;
+    String? removedPath;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: WellLessTheme.dark,
+        home: ProductInputScreen(
+          categories: const ['토너'],
+          capturedImages: const {
+            '토너': ['C:/camera/toner-a.jpg', 'C:/camera/toner-b.jpg'],
+          },
+          productNames: const {
+            'C:/camera/toner-a.jpg': '독도 토너',
+            'C:/camera/toner-b.jpg': '자작나무 수분 로션',
+          },
+          onBack: () {},
+          onCamera: (_) {},
+          onRemove: (category, path) {
+            removedCategory = category;
+            removedPath = path;
+          },
+          onAnalyze: () {},
+        ),
+      ),
+    );
+
+    expect(find.text('2개 등록'), findsOneWidget);
+    expect(find.text('독도 토너'), findsOneWidget);
+    expect(find.text('자작나무 수분 로션'), findsOneWidget);
+    expect(find.text('제거'), findsNWidgets(2));
+
+    await tester.tap(find.text('제거').first);
+    expect(removedCategory, '토너');
+    expect(removedPath, 'C:/camera/toner-a.jpg');
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('AAC replacement selects in place and opens comparison', (
     tester,
   ) async {
@@ -166,7 +206,7 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byIcon(Icons.task_alt_rounded), findsOneWidget);
-    expect(find.text('AAC 세이프 BHA 세럼'), findsOneWidget);
+    expect(find.text('스노우 빙하수 에센스 토너'), findsOneWidget);
   });
 
   testWidgets('OpenAI analysis values appear in routine and score screens', (
@@ -206,6 +246,95 @@ void main() {
 
     expect(find.text('72'), findsWidgets);
     expect(find.text('OpenAI 분석 세럼'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('zero AI score falls back to the 68 percent demo score', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(370, 824));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    const analysis = AiRoutineAnalysis(
+      products: [],
+      overallScore: 0,
+      summary: '점수 미제공',
+      removeCandidates: [],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: WellLessTheme.dark,
+        home: SuitabilityScreen(
+          replacementSelected: false,
+          onBack: () {},
+          onReplacement: () {},
+          onFinal: () {},
+          analysis: analysis,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is RichText && widget.text.toPlainText().contains('68%'),
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('removal updates routine score and its circular progress value', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(370, 824));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: WellLessTheme.dark,
+        home: SuitabilityScreen(
+          replacementSelected: false,
+          onBack: () {},
+          onReplacement: () {},
+          onFinal: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('× 제거').first, 180);
+    await tester.tap(find.text('× 제거').first);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is RichText && widget.text.toPlainText().contains('72%'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('cart shows the supplied Babaco product and 32000 won price', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(370, 824));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: WellLessTheme.dark,
+        home: CartScreen(onBack: () {}, onPaid: () {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('바바코 스노우 빙하수 에센스 토너'), findsOneWidget);
+    expect(find.text('₩32,000'), findsWidgets);
+    expect(find.byKey(const Key('babaco-cart-image')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

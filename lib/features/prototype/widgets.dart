@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:well_less_app/core/theme/well_less_theme.dart';
 
@@ -115,7 +116,8 @@ class PrimaryButton extends StatefulWidget {
   State<PrimaryButton> createState() => _PrimaryButtonState();
 }
 
-class _PrimaryButtonState extends State<PrimaryButton> with SingleTickerProviderStateMixin {
+class _PrimaryButtonState extends State<PrimaryButton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _tapController;
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _arrowAnimation;
@@ -128,19 +130,31 @@ class _PrimaryButtonState extends State<PrimaryButton> with SingleTickerProvider
       duration: const Duration(milliseconds: 200),
     );
 
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 0.98), weight: 50),
-      TweenSequenceItem(tween: Tween<double>(begin: 0.98, end: 1.0), weight: 50),
-    ]).animate(
-      CurvedAnimation(parent: _tapController, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = TweenSequence<double>(
+      [
+        TweenSequenceItem(
+          tween: Tween<double>(begin: 1.0, end: 0.98),
+          weight: 50,
+        ),
+        TweenSequenceItem(
+          tween: Tween<double>(begin: 0.98, end: 1.0),
+          weight: 50,
+        ),
+      ],
+    ).animate(CurvedAnimation(parent: _tapController, curve: Curves.easeInOut));
 
-    _arrowAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 0.0, end: 4.0), weight: 50),
-      TweenSequenceItem(tween: Tween<double>(begin: 4.0, end: 0.0), weight: 50),
-    ]).animate(
-      CurvedAnimation(parent: _tapController, curve: Curves.easeInOut),
-    );
+    _arrowAnimation = TweenSequence<double>(
+      [
+        TweenSequenceItem(
+          tween: Tween<double>(begin: 0.0, end: 4.0),
+          weight: 50,
+        ),
+        TweenSequenceItem(
+          tween: Tween<double>(begin: 4.0, end: 0.0),
+          weight: 50,
+        ),
+      ],
+    ).animate(CurvedAnimation(parent: _tapController, curve: Curves.easeInOut));
   }
 
   @override
@@ -166,7 +180,9 @@ class _PrimaryButtonState extends State<PrimaryButton> with SingleTickerProvider
     final labelText = widget.label;
     Widget buttonContent;
     if (labelText.endsWith('→')) {
-      final textWithoutArrow = labelText.substring(0, labelText.length - 1).trim();
+      final textWithoutArrow = labelText
+          .substring(0, labelText.length - 1)
+          .trim();
       buttonContent = Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -316,7 +332,8 @@ class MetricBar extends StatefulWidget {
   State<MetricBar> createState() => _MetricBarState();
 }
 
-class _MetricBarState extends State<MetricBar> with SingleTickerProviderStateMixin {
+class _MetricBarState extends State<MetricBar>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _labelOpacity;
   late final Animation<double> _redWidth;
@@ -338,21 +355,25 @@ class _MetricBarState extends State<MetricBar> with SingleTickerProviderStateMix
       ),
     );
 
-    _redWidth = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 0.0, end: widget.value * 0.97).chain(CurveTween(curve: Curves.easeOutCubic)),
-        weight: 85,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: widget.value * 0.97, end: widget.value).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 15,
-      ),
-    ]).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6),
-      ),
-    );
+    _redWidth =
+        TweenSequence<double>([
+          TweenSequenceItem(
+            tween: Tween<double>(
+              begin: 0.0,
+              end: widget.value * 0.97,
+            ).chain(CurveTween(curve: Curves.easeOutCubic)),
+            weight: 85,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(
+              begin: widget.value * 0.97,
+              end: widget.value,
+            ).chain(CurveTween(curve: Curves.easeOut)),
+            weight: 15,
+          ),
+        ]).animate(
+          CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6)),
+        );
 
     _grayWidth = Tween<double>(begin: 0.0, end: widget.reference).animate(
       CurvedAnimation(
@@ -389,7 +410,10 @@ class _MetricBarState extends State<MetricBar> with SingleTickerProviderStateMix
                 opacity: _labelOpacity.value,
                 child: Text(
                   widget.label,
-                  style: const TextStyle(fontSize: 12, color: WellLessColors.text),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: WellLessColors.text,
+                  ),
                 ),
               ),
               const SizedBox(height: 4),

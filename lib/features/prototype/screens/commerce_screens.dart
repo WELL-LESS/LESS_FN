@@ -18,14 +18,15 @@ class FinalRoutineScreen extends StatefulWidget {
   State<FinalRoutineScreen> createState() => _FinalRoutineScreenState();
 }
 
-class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTickerProviderStateMixin {
+class _FinalRoutineScreenState extends State<FinalRoutineScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _entranceController;
 
   late final Animation<double> _headerOpacity;
   late final Animation<double> _headerTranslateY;
   late final Animation<double> _circleProgress;
   late final Animation<double> _checkProgress;
-  
+
   late final Animation<double> _line1Progress;
   late final Animation<double> _line2Progress;
   late final Animation<double> _aacLabelProgress;
@@ -40,31 +41,55 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
     );
 
     _headerOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.12, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.0, 0.12, curve: Curves.easeOut),
+      ),
     );
     _headerTranslateY = Tween<double>(begin: 5.0, end: 0.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.12, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.0, 0.12, curve: Curves.easeOut),
+      ),
     );
 
     _circleProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.08, 0.32, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.08, 0.32, curve: Curves.easeOut),
+      ),
     );
     _checkProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.22, 0.42, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.22, 0.42, curve: Curves.easeOut),
+      ),
     );
 
     _line1Progress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.38, 0.54, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.38, 0.54, curve: Curves.easeOut),
+      ),
     );
     _line2Progress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.44, 0.60, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.44, 0.60, curve: Curves.easeOut),
+      ),
     );
 
     _aacLabelProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.52, 0.68, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.52, 0.68, curve: Curves.easeOut),
+      ),
     );
     _ctaProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.88, 1.0, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.88, 1.0, curve: Curves.easeOut),
+      ),
     );
 
     _entranceController.forward();
@@ -127,7 +152,10 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
         builder: (context, _) {
           double checkScale = 1.0;
           if (_entranceController.value >= 0.42) {
-            final p = ((_entranceController.value - 0.42) / 0.08).clamp(0.0, 1.0);
+            final p = ((_entranceController.value - 0.42) / 0.08).clamp(
+              0.0,
+              1.0,
+            );
             if (p < 0.5) {
               checkScale = 1.0 + (p / 0.5) * 0.04;
             } else {
@@ -176,14 +204,17 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
                         Opacity(
                           opacity: _line1Progress.value,
                           child: Transform.translate(
-                            offset: Offset((1.0 - _line1Progress.value) * 8.0, (1.0 - _line1Progress.value) * 3.0),
+                            offset: Offset(
+                              (1.0 - _line1Progress.value) * 8.0,
+                              (1.0 - _line1Progress.value) * 3.0,
+                            ),
                             child: const Text(
                               '필요한 것만 남긴,',
                               style: TextStyle(
-                                  fontSize: 21,
-                                  height: 1.25,
-                                  color: WellLessColors.muted,
-                                  fontWeight: FontWeight.w900,
+                                fontSize: 21,
+                                height: 1.25,
+                                color: WellLessColors.muted,
+                                fontWeight: FontWeight.w900,
                               ),
                             ),
                           ),
@@ -191,14 +222,17 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
                         Opacity(
                           opacity: _line2Progress.value,
                           child: Transform.translate(
-                            offset: Offset((1.0 - _line2Progress.value) * 8.0, (1.0 - _line2Progress.value) * 3.0),
+                            offset: Offset(
+                              (1.0 - _line2Progress.value) * 8.0,
+                              (1.0 - _line2Progress.value) * 3.0,
+                            ),
                             child: const Text(
                               '당신을 위한 루틴이에요.',
                               style: TextStyle(
-                                  fontSize: 21,
-                                  height: 1.25,
-                                  color: WellLessColors.success,
-                                  fontWeight: FontWeight.w900,
+                                fontSize: 21,
+                                height: 1.25,
+                                color: WellLessColors.success,
+                                fontWeight: FontWeight.w900,
                               ),
                             ),
                           ),
@@ -217,12 +251,18 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
                     children: [
                       Transform.scale(
                         scale: _aacLabelProgress.value,
-                        child: const CircleAvatar(radius: 3, backgroundColor: WellLessColors.success),
+                        child: const CircleAvatar(
+                          radius: 3,
+                          backgroundColor: WellLessColors.success,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       const Text(
                         'AAC 교체 제품',
-                        style: TextStyle(fontSize: 11, color: WellLessColors.dim),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: WellLessColors.dim,
+                        ),
                       ),
                     ],
                   ),
@@ -236,8 +276,9 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
                   itemBuilder: (context, index) {
                     final p = _getItemProgress(index);
                     double borderOpacity = 1.0;
-                    if (index == 3 && _entranceController.value >= 0.82) {
-                      final val = ((_entranceController.value - 0.82) / 0.12).clamp(0.0, 1.0);
+                    if (index == 0 && _entranceController.value >= 0.82) {
+                      final val = ((_entranceController.value - 0.82) / 0.12)
+                          .clamp(0.0, 1.0);
                       borderOpacity = 1.0 - (val * (1.0 - val)) * 0.44;
                     }
 
@@ -248,7 +289,7 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
                         child: _FinalRoutineItem(
                           product: finalRoutineProducts[index],
                           index: index,
-                          selected: index == 3,
+                          selected: index == 0,
                           revealProgress: p,
                           borderOpacity: borderOpacity,
                         ),
@@ -266,7 +307,10 @@ class _FinalRoutineScreenState extends State<FinalRoutineScreen> with SingleTick
 }
 
 class _CheckmarkPainter extends CustomPainter {
-  _CheckmarkPainter({required this.circleProgress, required this.checkProgress});
+  _CheckmarkPainter({
+    required this.circleProgress,
+    required this.checkProgress,
+  });
   final double circleProgress;
   final double checkProgress;
 
@@ -317,7 +361,8 @@ class _CheckmarkPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CheckmarkPainter oldDelegate) =>
-      oldDelegate.circleProgress != circleProgress || oldDelegate.checkProgress != checkProgress;
+      oldDelegate.circleProgress != circleProgress ||
+      oldDelegate.checkProgress != checkProgress;
 }
 
 class _FinalRoutineItem extends StatelessWidget {
@@ -372,7 +417,8 @@ class _FinalRoutineItem extends StatelessWidget {
                 Opacity(
                   opacity: (revealProgress / 0.4).clamp(0.0, 1.0),
                   child: Transform.scale(
-                    scale: 0.85 + ((revealProgress / 0.4).clamp(0.0, 1.0) * 0.15),
+                    scale:
+                        0.85 + ((revealProgress / 0.4).clamp(0.0, 1.0) * 0.15),
                     child: Container(
                       width: circleSize,
                       height: circleSize,
@@ -384,7 +430,9 @@ class _FinalRoutineItem extends StatelessWidget {
                             : WellLessColors.surface,
                         border: Border.all(
                           color: selected
-                              ? WellLessColors.success.withValues(alpha: borderOpacity)
+                              ? WellLessColors.success.withValues(
+                                  alpha: borderOpacity,
+                                )
                               : WellLessColors.divider,
                         ),
                       ),
@@ -408,7 +456,9 @@ class _FinalRoutineItem extends StatelessWidget {
             width: 14,
             child: selected
                 ? ColoredBox(
-                    color: WellLessColors.success.withValues(alpha: borderOpacity),
+                    color: WellLessColors.success.withValues(
+                      alpha: borderOpacity,
+                    ),
                     child: const SizedBox(height: 1),
                   )
                 : null,
@@ -417,13 +467,23 @@ class _FinalRoutineItem extends StatelessWidget {
             child: Opacity(
               opacity: (revealProgress - 0.2).clamp(0.0, 1.0),
               child: Transform.translate(
-                offset: Offset((1.0 - (revealProgress - 0.2).clamp(0.0, 1.0)) * 6.0, 0.0),
+                offset: Offset(
+                  (1.0 - (revealProgress - 0.2).clamp(0.0, 1.0)) * 6.0,
+                  0.0,
+                ),
                 child: Container(
                   height: 64,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     border: selected
-                        ? Border.all(color: WellLessColors.success.withValues(alpha: borderOpacity))
+                        ? Border.all(
+                            color: WellLessColors.success.withValues(
+                              alpha: borderOpacity,
+                            ),
+                          )
                         : null,
                   ),
                   child: Column(
@@ -495,7 +555,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     DemoPaymentMethod.toss => '토스페이',
   };
 
-  int get total => 48000 * quantity;
+  int get total => 32000 * quantity;
 
   bool _sheetVisible = false;
   late final AnimationController _entranceController;
@@ -520,19 +580,34 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
     );
 
     _headerProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.32, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.0, 0.32, curve: Curves.easeOut),
+      ),
     );
     _cardProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.14, 0.46, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.14, 0.46, curve: Curves.easeOut),
+      ),
     );
     _totalProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.28, 0.60, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.28, 0.60, curve: Curves.easeOut),
+      ),
     );
     _methodProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.42, 0.74, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.42, 0.74, curve: Curves.easeOut),
+      ),
     );
     _ctaProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _entranceController, curve: const Interval(0.56, 0.88, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.56, 0.88, curve: Curves.easeOut),
+      ),
     );
 
     _entranceController.forward();
@@ -602,7 +677,10 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                       offset: Offset(0.0, (1.0 - _headerProgress.value) * 12.0),
                       child: const Text(
                         '선택한 제품',
-                        style: TextStyle(fontSize: 10, color: WellLessColors.dim),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: WellLessColors.dim,
+                        ),
                       ),
                     ),
                   ),
@@ -624,7 +702,10 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                           child: Row(
                             children: [
                               Opacity(
-                                opacity: (_cardProgress.value - 0.25).clamp(0.0, 1.0),
+                                opacity: (_cardProgress.value - 0.25).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
                                 child: Container(
                                   width: 86,
                                   height: 110,
@@ -632,7 +713,15 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                                     color: WellLessColors.surfaceRaised,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: const ProductBottle(size: 76),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: Image.asset(
+                                      'assets/images/babaco_snow_glacial_toner.png',
+                                      key: const Key('babaco-cart-image'),
+                                      fit: BoxFit.contain,
+                                      semanticLabel: '바바코 스노우 빙하수 에센스 토너',
+                                    ),
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 18),
@@ -642,17 +731,24 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Opacity(
-                                      opacity: (_cardProgress.value - 0.35).clamp(0.0, 1.0),
+                                      opacity: (_cardProgress.value - 0.35)
+                                          .clamp(0.0, 1.0),
                                       child: const Text(
-                                        'AAC 세이프 BHA 세럼',
-                                        style: TextStyle(fontSize: 13),
+                                        '바바코 스노우 빙하수 에센스 토너',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          height: 1.25,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Opacity(
-                                      opacity: (_cardProgress.value - 0.35).clamp(0.0, 1.0),
+                                      opacity: (_cardProgress.value - 0.35)
+                                          .clamp(0.0, 1.0),
                                       child: Text(
-                                        'AAC 세이프 BHA 세럼 x $quantity',
+                                        '수량 $quantity개',
                                         style: const TextStyle(
                                           fontSize: 10,
                                           color: WellLessColors.dim,
@@ -661,7 +757,8 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                                     ),
                                     const SizedBox(height: 10),
                                     Opacity(
-                                      opacity: (_cardProgress.value - 0.45).clamp(0.0, 1.0),
+                                      opacity: (_cardProgress.value - 0.45)
+                                          .clamp(0.0, 1.0),
                                       child: Text(
                                         '₩${_money(total)}',
                                         style: const TextStyle(
@@ -675,13 +772,18 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                                 ),
                               ),
                               Opacity(
-                                opacity: (_cardProgress.value - 0.50).clamp(0.0, 1.0),
+                                opacity: (_cardProgress.value - 0.50).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
                                 child: Row(
                                   children: [
                                     _QuantityButton(
                                       label: '−',
                                       onTap: () => setState(
-                                        () => quantity = quantity > 1 ? quantity - 1 : 1,
+                                        () => quantity = quantity > 1
+                                            ? quantity - 1
+                                            : 1,
                                       ),
                                     ),
                                     SizedBox(
@@ -689,7 +791,9 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                                       child: Text(
                                         '$quantity',
                                         textAlign: TextAlign.center,
-                                        style: const TextStyle(fontWeight: FontWeight.w700),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       ),
                                     ),
                                     _QuantityButton(
@@ -733,7 +837,10 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                               children: [
                                 const Text(
                                   '총 결제 금액',
-                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                                 const Spacer(),
                                 Text(
@@ -773,7 +880,9 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               height: 56,
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
                               decoration: BoxDecoration(
                                 color: WellLessColors.surfaceRaised,
                                 borderRadius: BorderRadius.circular(12),
@@ -815,9 +924,7 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
                 animation: _sheetController,
                 builder: (context, _) {
                   final dim = _sheetController.value * 0.55;
-                  return Container(
-                    color: Colors.black.withValues(alpha: dim),
-                  );
+                  return Container(color: Colors.black.withValues(alpha: dim));
                 },
               ),
             ),
@@ -826,7 +933,10 @@ class _CartScreenState extends State<CartScreen> with TickerProviderStateMixin {
           AnimatedBuilder(
             animation: _sheetController,
             builder: (context, child) {
-              final curve = CurvedAnimation(parent: _sheetController, curve: const Cubic(0.22, 1.0, 0.36, 1.0));
+              final curve = CurvedAnimation(
+                parent: _sheetController,
+                curve: const Cubic(0.22, 1.0, 0.36, 1.0),
+              );
               final translateY = (1.0 - curve.value) * 440.0;
               return Positioned(
                 left: 0,
@@ -906,7 +1016,10 @@ class _PaymentSheet extends StatelessWidget {
           builder: (context, _) {
             final hbProgress = (sheetProgress.value / 0.7).clamp(0.0, 1.0);
             final hbScaleX = 0.65 + hbProgress * 0.35;
-            final titleProgress = ((sheetProgress.value - 0.6) / 0.2).clamp(0.0, 1.0);
+            final titleProgress = ((sheetProgress.value - 0.6) / 0.2).clamp(
+              0.0,
+              1.0,
+            );
 
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -932,7 +1045,10 @@ class _PaymentSheet extends StatelessWidget {
                         const Expanded(
                           child: Text(
                             '결제 수단 선택',
-                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
                         GestureDetector(
@@ -1035,7 +1151,10 @@ class _PaymentRowState extends State<_PaymentRow> {
                   ),
                   Text(
                     widget.label,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -1114,9 +1233,10 @@ class OrderCompleteScreen extends StatefulWidget {
   State<OrderCompleteScreen> createState() => _OrderCompleteScreenState();
 }
 
-class _OrderCompleteScreenState extends State<OrderCompleteScreen> with SingleTickerProviderStateMixin {
+class _OrderCompleteScreenState extends State<OrderCompleteScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  
+
   late final Animation<double> _orderTextProgress;
   late final Animation<double> _doneTextProgress;
   late final Animation<double> _circleProgress;
@@ -1134,25 +1254,46 @@ class _OrderCompleteScreenState extends State<OrderCompleteScreen> with SingleTi
     );
 
     _orderTextProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.1, 0.25, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.1, 0.25, curve: Curves.easeOut),
+      ),
     );
     _doneTextProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.15, 0.3, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.15, 0.3, curve: Curves.easeOut),
+      ),
     );
     _circleProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.225, 0.525, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.225, 0.525, curve: Curves.easeOut),
+      ),
     );
     _checkProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.45, 0.65, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.45, 0.65, curve: Curves.easeOut),
+      ),
     );
     _settleProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.625, 0.725, curve: Curves.easeInOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.625, 0.725, curve: Curves.easeInOut),
+      ),
     );
     _descProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.675, 0.805, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.675, 0.805, curve: Curves.easeOut),
+      ),
     );
     _btnProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.8, 0.95, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.8, 0.95, curve: Curves.easeOut),
+      ),
     );
 
     _controller.forward();
@@ -1206,7 +1347,10 @@ class _OrderCompleteScreenState extends State<OrderCompleteScreen> with SingleTi
                             height: 0,
                             child: SvgPicture.asset(
                               'assets/icons/order_check.svg',
-                              colorFilter: const ColorFilter.mode(Colors.transparent, BlendMode.srcIn),
+                              colorFilter: const ColorFilter.mode(
+                                Colors.transparent,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ],
@@ -1217,7 +1361,10 @@ class _OrderCompleteScreenState extends State<OrderCompleteScreen> with SingleTi
                   Opacity(
                     opacity: _orderTextProgress.value,
                     child: Transform.translate(
-                      offset: Offset(0.0, (1.0 - _orderTextProgress.value) * 10.0),
+                      offset: Offset(
+                        0.0,
+                        (1.0 - _orderTextProgress.value) * 10.0,
+                      ),
                       child: const Text(
                         '주문',
                         style: TextStyle(
@@ -1231,7 +1378,10 @@ class _OrderCompleteScreenState extends State<OrderCompleteScreen> with SingleTi
                   Opacity(
                     opacity: _doneTextProgress.value,
                     child: Transform.translate(
-                      offset: Offset(0.0, (1.0 - _doneTextProgress.value) * 10.0),
+                      offset: Offset(
+                        0.0,
+                        (1.0 - _doneTextProgress.value) * 10.0,
+                      ),
                       child: const Text(
                         '완료',
                         style: TextStyle(
@@ -1250,7 +1400,10 @@ class _OrderCompleteScreenState extends State<OrderCompleteScreen> with SingleTi
                       offset: Offset(0.0, (1.0 - _descProgress.value) * 8.0),
                       child: const Text(
                         'AAC Skin 제품이 곧 배송됩니다.',
-                        style: TextStyle(fontSize: 13, color: WellLessColors.text),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: WellLessColors.text,
+                        ),
                       ),
                     ),
                   ),
@@ -1273,7 +1426,10 @@ class _OrderCompleteScreenState extends State<OrderCompleteScreen> with SingleTi
 }
 
 class _OrderCompleteCheckPainter extends CustomPainter {
-  _OrderCompleteCheckPainter({required this.circleProgress, required this.checkProgress});
+  _OrderCompleteCheckPainter({
+    required this.circleProgress,
+    required this.checkProgress,
+  });
   final double circleProgress;
   final double checkProgress;
 
@@ -1324,7 +1480,8 @@ class _OrderCompleteCheckPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _OrderCompleteCheckPainter oldDelegate) =>
-      oldDelegate.circleProgress != circleProgress || oldDelegate.checkProgress != checkProgress;
+      oldDelegate.circleProgress != circleProgress ||
+      oldDelegate.checkProgress != checkProgress;
 }
 
 class _OrderRoutineButton extends StatefulWidget {
@@ -1335,7 +1492,8 @@ class _OrderRoutineButton extends StatefulWidget {
   State<_OrderRoutineButton> createState() => _OrderRoutineButtonState();
 }
 
-class _OrderRoutineButtonState extends State<_OrderRoutineButton> with SingleTickerProviderStateMixin {
+class _OrderRoutineButtonState extends State<_OrderRoutineButton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _arrowAnimation;
@@ -1348,8 +1506,14 @@ class _OrderRoutineButtonState extends State<_OrderRoutineButton> with SingleTic
       duration: const Duration(milliseconds: 190),
     );
     _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 0.98), weight: 50),
-      TweenSequenceItem(tween: Tween<double>(begin: 0.98, end: 1.0), weight: 50),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 0.98),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.98, end: 1.0),
+        weight: 50,
+      ),
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _arrowAnimation = TweenSequence<double>([

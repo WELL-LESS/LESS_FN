@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:well_less_app/core/network/ai_analysis_service.dart';
 import 'package:well_less_app/core/network/well_less_api_service.dart';
 import 'package:well_less_app/core/theme/well_less_theme.dart';
 import 'package:well_less_app/features/prototype/ai_analysis.dart';
@@ -38,16 +37,24 @@ class _WellLessFlowState extends State<WellLessFlow> {
   FlowStep _step = FlowStep.splashKorean;
   final List<FlowStep> _history = [];
   bool _replacementSelected = false;
-  final AiAnalysisService _aiAnalysisService = AiAnalysisService();
   final WellLessApiService _apiService = WellLessApiService();
-  final Map<String, String> _capturedImages = {};
-  final Set<String> _uploadedImagePaths = {};
+  final Map<String, List<String>> _capturedImages = {};
+  final List<String> _captureOrder = [];
+  final Map<String, String> _uploadedInputIdsByPath = {};
   List<String> _selectedCategories = [];
   WellLessSession? _session;
   String? _routineId;
   String? _captureCategory;
   bool _creatingRoutine = false;
   AiRoutineAnalysis? _analysis;
+
+  static const _demoProductNames = <String>[
+    '독도 토너',
+    '자작나무 수분 로션',
+    '메노킨 선크림',
+    '제주 알로에 수딩젤',
+    '달바 화이트 트러플 엑소 인텐시브 세럼',
+  ];
 
   static const _categoryCodes = <String, String>{
     '클렌징젤': 'CLEANSING_FOAM_GEL',
@@ -125,7 +132,8 @@ class _WellLessFlowState extends State<WellLessFlow> {
       setState(() {
         _selectedCategories = List.of(categories);
         _capturedImages.clear();
-        _uploadedImagePaths.clear();
+        _captureOrder.clear();
+        _uploadedInputIdsByPath.clear();
         _routineId = routineId;
       });
       _go(FlowStep.productInput);
@@ -137,51 +145,105 @@ class _WellLessFlowState extends State<WellLessFlow> {
   }
 
   Future<void> _startAnalysis() async {
-    final session = _session;
-    final routineId = _routineId;
     if (_capturedImages.isEmpty) {
       _showMessage('AI 분석을 위해 제품 사진을 먼저 촬영해주세요.');
       return;
     }
-    if (session == null || routineId == null) {
-      _showMessage('루틴 세션이 없습니다. 카테고리 선택부터 다시 진행해주세요.');
-      return;
-    }
+
+    // Hackathon demo mode: keep the camera experience, but avoid all image
+    // uploads and OpenAI calls so the presentation is independent of quota
+    // and network conditions.
     _go(FlowStep.loading);
-    try {
-      for (final entry in _capturedImages.entries) {
-        if (_uploadedImagePaths.contains(entry.value)) continue;
-        final categoryCode = _categoryCodes[entry.key];
-        if (categoryCode == null) continue;
-        await _apiService.uploadProductImage(
+    await Future<void>.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
+    setState(() {
+      _analysis = _buildDemoAnalysis();
+      _step = FlowStep.routine;
+    });
+  }
+
+  AiRoutineAnalysis _buildDemoAnalysis() {
+    const products = <AiAnalyzedProduct>[
+      AiAnalyzedProduct(
+        name: '독도 토너',
+        category: '토너',
+        description: '판테놀·베타인·알란토인을 함유해 세안 후 피부결을 정돈하고 편안한 수분감을 더해주는 기본 토너입니다.',
+        score: 60,
+        ingredients: ['판테놀', '베타인', '알란토인', '해수'],
+      ),
+      AiAnalyzedProduct(
+        name: '자작나무 수분 로션',
+        category: '로션',
+        description: '비타민C 계열과 보습 성분을 통해 피부톤과 수분 관리를 보완합니다. 다만 P축 역할이 선크림과 겹쳐 루틴 간소화를 위한 정리 검토 제품으로 선정됐습니다.',
+        score: 55,
+        ingredients: ['아스코빅애씨드(P)', '히알루론산(C)', '토코페롤(N)', '자작나무수액'],
+      ),
+      AiAnalyzedProduct(
+        name: '메노킨 선크림',
+        category: '선크림',
+        description:
+            '나이아신아마이드와 비타민C 계열이 O·P축을 보완하며, 마지막 단계에서 자외선으로부터 피부를 보호합니다.',
+        score: 66,
+        ingredients: ['병풀추출물(S)', '알로에베라잎수', '녹차추출물', '감초뿌리추출물'],
+      ),
+      AiAnalyzedProduct(
+        name: '제주 알로에 수딩젤',
+        category: '수딩젤',
+        description: '알로에베라잎수와 병풀추출물이 피부에 수분을 공급하고 S축의 진정 관리를 보완합니다.',
+        score: 73,
+        ingredients: ['나이아신아마이드(O)', '비타민C 계열(P)', '세라마이드NP(D)', '자외선 차단 성분'],
+      ),
+      AiAnalyzedProduct(
+        name: '달바 화이트 트러플 엑소 인텐시브 세럼',
+        category: '세럼',
+        description: '제품 성분 정보를 확인할 수 없어 피부 적합도 측정이 불가합니다.',
+        score: 0,
+        ingredients: [],
+      ),
+    ];
+    return const AiRoutineAnalysis(
+      products: products,
+      overallScore: 68,
+      summary: '5개 제품을 분석한 결과 현재 루틴 적합도는 68%입니다.',
+      removeCandidates: <AiRemoveCandidate>[
+        AiRemoveCandidate(
+          product: '자작나무 수분 로션',
+          reason: '선크림과 P축 역할이 겹쳐 루틴 간소화를 위한 정리를 검토할 수 있습니다.',
+          scoreAfterRemoval: 72,
+        ),
+        AiRemoveCandidate(
+          product: '달바 화이트 트러플 엑소 인텐시브 세럼',
+          reason: '성분 정보 부족으로 적합도 측정이 불가합니다.',
+          scoreAfterRemoval: 72,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _removeCapturedImage(String category, String imagePath) async {
+    final inputId = _uploadedInputIdsByPath[imagePath];
+    final session = _session;
+    final routineId = _routineId;
+    if (inputId != null && session != null && routineId != null) {
+      try {
+        await _apiService.deleteProductInput(
           session: session,
           routineId: routineId,
-          categoryCode: categoryCode,
-          imagePath: entry.value,
+          inputId: inputId,
         );
-        _uploadedImagePaths.add(entry.value);
+      } on WellLessApiException catch (error) {
+        _showMessage(error.message);
+        return;
       }
-      final analysis = await _aiAnalysisService.analyzeRoutine(
-        accessToken: session.accessToken,
-        routineId: routineId,
-        profileCode: session.skinTypeCode,
-        imagePaths: _capturedImages.values.toList(growable: false),
-      );
-      if (!mounted) return;
-      setState(() {
-        _analysis = analysis;
-        _history.add(_step);
-        _step = FlowStep.routine;
-      });
-    } on AiAnalysisException catch (error) {
-      if (!mounted) return;
-      setState(() => _step = FlowStep.productInput);
-      _showMessage(error.message);
-    } on WellLessApiException catch (error) {
-      if (!mounted) return;
-      setState(() => _step = FlowStep.productInput);
-      _showMessage(error.message);
     }
+    if (!mounted) return;
+    setState(() {
+      final images = _capturedImages[category];
+      images?.remove(imagePath);
+      _captureOrder.remove(imagePath);
+      if (images != null && images.isEmpty) _capturedImages.remove(category);
+      _uploadedInputIdsByPath.remove(imagePath);
+    });
   }
 
   void _showMessage(String message) {
@@ -242,11 +304,17 @@ class _WellLessFlowState extends State<WellLessFlow> {
       FlowStep.productInput => ProductInputScreen(
         categories: _selectedCategories,
         capturedImages: _capturedImages,
+        productNames: {
+          for (var index = 0; index < _captureOrder.length; index++)
+            _captureOrder[index]:
+                _demoProductNames[index.clamp(0, _demoProductNames.length - 1)],
+        },
         onBack: _back,
         onCamera: (category) {
           _captureCategory = category;
           _go(FlowStep.camera);
         },
+        onRemove: _removeCapturedImage,
         onAnalyze: _startAnalysis,
       ),
       FlowStep.camera => CameraScreen(
@@ -254,9 +322,8 @@ class _WellLessFlowState extends State<WellLessFlow> {
         onCapture: (path) {
           final category = _captureCategory;
           if (category != null) {
-            final previousPath = _capturedImages[category];
-            if (previousPath != null) _uploadedImagePaths.remove(previousPath);
-            _capturedImages[category] = path;
+            _capturedImages.putIfAbsent(category, () => <String>[]).add(path);
+            _captureOrder.add(path);
           }
           _back();
         },

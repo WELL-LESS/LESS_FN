@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:well_less_app/core/theme/well_less_theme.dart';
 import 'package:well_less_app/features/prototype/widgets.dart';
@@ -361,61 +361,8 @@ class _SplashFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFF000000),
-    body: Stack(
-      children: [
-        const Positioned.fill(child: CustomPaint(painter: _CrossHairPainter())),
-        Center(child: child),
-      ],
-    ),
+    body: Center(child: child),
   );
-}
-
-class _CrossHairPainter extends CustomPainter {
-  const _CrossHairPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final faint = Paint()..color = const Color(0xFF131313);
-    canvas.drawRect(Rect.fromLTWH(size.width / 2, 0, 1, size.height), faint);
-    canvas.drawRect(Rect.fromLTWH(0, size.height / 2, size.width, 1), faint);
-    final corners = Paint()
-      ..color = WellLessColors.border
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    const d = 16.0;
-    const inset = 28.0;
-    canvas.drawPath(
-      Path()
-        ..moveTo(inset + d, inset)
-        ..lineTo(inset, inset)
-        ..lineTo(inset, inset + d),
-      corners,
-    );
-    canvas.drawPath(
-      Path()
-        ..moveTo(size.width - inset - d, inset)
-        ..lineTo(size.width - inset, inset)
-        ..lineTo(size.width - inset, inset + d),
-      corners,
-    );
-    canvas.drawPath(
-      Path()
-        ..moveTo(inset, size.height - inset - d)
-        ..lineTo(inset, size.height - inset)
-        ..lineTo(inset + d, size.height - inset),
-      corners,
-    );
-    canvas.drawPath(
-      Path()
-        ..moveTo(size.width - inset, size.height - inset - d)
-        ..lineTo(size.width - inset, size.height - inset)
-        ..lineTo(size.width - inset - d, size.height - inset),
-      corners,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class RevealWidget extends StatelessWidget {
@@ -1463,15 +1410,18 @@ class _ReportScreenState extends State<ReportScreen>
         Expanded(
           child: _details
               ? const _DetailedMetrics()
-              : _SkinTypeSummary(
-                  revealController: _cardsController,
-                  activeFamilyCode: _activeFamilyCode,
-                  onSelectFamily: (code) {
-                    setState(() => _activeFamilyCode = code);
-                  },
-                  onCloseFamily: () {
-                    setState(() => _activeFamilyCode = null);
-                  },
+              : SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: _SkinTypeSummary(
+                    revealController: _cardsController,
+                    activeFamilyCode: _activeFamilyCode,
+                    onSelectFamily: (code) {
+                      setState(() => _activeFamilyCode = code);
+                    },
+                    onCloseFamily: () {
+                      setState(() => _activeFamilyCode = null);
+                    },
+                  ),
                 ),
         ),
       ],
@@ -2147,6 +2097,7 @@ class _CategoryScreenState extends State<CategoryScreen>
             child: Transform.scale(
               scale: scale,
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () {
                   setState(() {
                     if (selected.contains(cat)) {
@@ -2157,8 +2108,8 @@ class _CategoryScreenState extends State<CategoryScreen>
                   });
                 },
                 child: SizedBox(
-                  width: 120,
-                  height: 36,
+                  width: 138,
+                  height: 44,
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
@@ -2210,6 +2161,7 @@ class _CategoryScreenState extends State<CategoryScreen>
             child: Transform.scale(
               scale: scale,
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () {
                   setState(() {
                     if (selected.contains(cat)) {
@@ -2220,8 +2172,8 @@ class _CategoryScreenState extends State<CategoryScreen>
                   });
                 },
                 child: SizedBox(
-                  width: 120,
-                  height: 36,
+                  width: 138,
+                  height: 44,
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -2267,22 +2219,27 @@ class _CategoryScreenState extends State<CategoryScreen>
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 28,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
+          height: 100,
+          child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            itemCount: selected.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 7),
-            itemBuilder: (context, index) {
-              final item = selected.elementAt(index);
-              return GestureDetector(
-                onTap: () => setState(() => selected.remove(item)),
-                child: SmallPill(item, active: true),
-              );
-            },
+            child: Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: selected
+                  .map(
+                    (item) => GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => setState(() => selected.remove(item)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: SmallPill(item, active: true),
+                      ),
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
           ),
         ),
-        const SizedBox(height: 72),
         Center(
           child: GestureDetector(
             onVerticalDragUpdate: _onDragUpdate,
@@ -2414,66 +2371,89 @@ class ProductInputScreen extends StatelessWidget {
   const ProductInputScreen({
     required this.categories,
     required this.capturedImages,
+    required this.productNames,
     required this.onBack,
     required this.onCamera,
+    required this.onRemove,
     required this.onAnalyze,
     super.key,
   });
   final List<String> categories;
-  final Map<String, String> capturedImages;
+  final Map<String, List<String>> capturedImages;
+  final Map<String, String> productNames;
   final VoidCallback onBack;
   final ValueChanged<String> onCamera;
+  final void Function(String category, String imagePath) onRemove;
   final VoidCallback onAnalyze;
 
   @override
-  Widget build(BuildContext context) => FlowScaffold(
-    title: '제품 등록',
-    onBack: onBack,
-    trailing: Text(
-      '${capturedImages.length}개 등록',
-      style: const TextStyle(
-        color: WellLessColors.primary,
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) {
+    final registeredCount = capturedImages.values.fold<int>(
+      0,
+      (count, paths) => count + paths.length,
+    );
+    return FlowScaffold(
+      title: '제품 등록',
+      onBack: onBack,
+      trailing: Text(
+        '$registeredCount개 등록',
+        style: const TextStyle(
+          color: WellLessColors.primary,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
       ),
-    ),
-    footer: PrimaryButton(
-      label: 'AI 루틴 분석 →',
-      enabled: capturedImages.isNotEmpty,
-      onPressed: onAnalyze,
-    ),
-    child: ListView.separated(
-      padding: const EdgeInsets.only(top: 12, bottom: 24),
-      itemCount: categories.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 32),
-      itemBuilder: (context, index) {
-        final category = categories[index];
-        final imagePath = capturedImages[category];
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionEyebrow(category, color: WellLessColors.text),
-            if (imagePath != null) ...[
-              const SizedBox(height: 10),
-              _RegisteredProduct(
-                name: imagePath.split(RegExp(r'[/\\]')).last,
-                brand: 'AI 분석 전',
-              ),
-              const SizedBox(height: 8),
-            ] else
-              const SizedBox(height: 10),
-            _PhotoInput(onTap: () => onCamera(category)),
-          ],
-        );
-      },
-    ),
-  );
+      footer: PrimaryButton(
+        label: 'AI 루틴 분석 →',
+        enabled: registeredCount >= 5,
+        onPressed: onAnalyze,
+      ),
+      child: ListView.separated(
+        padding: const EdgeInsets.only(top: 12, bottom: 24),
+        itemCount: categories.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 32),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          final imagePaths = capturedImages[category] ?? const <String>[];
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SectionEyebrow(category, color: WellLessColors.text),
+              if (imagePaths.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                for (final imagePath in imagePaths) ...[
+                  _RegisteredProduct(
+                    name:
+                        productNames[imagePath] ??
+                        imagePath.split(RegExp(r'[/\\]')).last,
+                    imagePath: imagePath,
+                    brand: 'AI 분석 전',
+                    onRemove: () => onRemove(category, imagePath),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ] else
+                const SizedBox(height: 10),
+              _PhotoInput(onTap: () => onCamera(category)),
+            ],
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _RegisteredProduct extends StatelessWidget {
-  const _RegisteredProduct({required this.name, this.brand = '촬영 이미지'});
+  const _RegisteredProduct({
+    required this.name,
+    required this.imagePath,
+    required this.onRemove,
+    this.brand = '촬영 이미지',
+  });
   final String name;
+  final String imagePath;
   final String brand;
+  final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -2490,7 +2470,17 @@ class _RegisteredProduct extends StatelessWidget {
           height: 40,
           alignment: Alignment.center,
           color: WellLessColors.surfaceRaised,
-          child: const Text('🧴'),
+          child: Image.file(
+            File(imagePath),
+            width: 40,
+            height: 40,
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => const Icon(
+              Icons.image_outlined,
+              size: 18,
+              color: WellLessColors.dim,
+            ),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -2506,14 +2496,19 @@ class _RegisteredProduct extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-          decoration: BoxDecoration(
-            border: Border.all(color: WellLessColors.border),
-          ),
-          child: const Text(
-            '제거',
-            style: TextStyle(fontSize: 10, color: WellLessColors.dim),
+        InkWell(
+          onTap: onRemove,
+          child: Container(
+            constraints: const BoxConstraints(minWidth: 52, minHeight: 44),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: WellLessColors.border),
+            ),
+            child: const Text(
+              '제거',
+              style: TextStyle(fontSize: 10, color: WellLessColors.text),
+            ),
           ),
         ),
       ],
@@ -2816,7 +2811,7 @@ class _LoadingScreenState extends State<LoadingScreen>
       }
     });
 
-    timer = Timer(const Duration(milliseconds: 1800), widget.onComplete);
+    timer = Timer(const Duration(seconds: 3), widget.onComplete);
   }
 
   @override

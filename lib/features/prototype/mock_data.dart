@@ -17,11 +17,11 @@ const routineProducts = <RoutineProduct>[
 ];
 
 const finalRoutineProducts = <RoutineProduct>[
-  RoutineProduct('COSRX 오일-프리 클렌저', '클렌저', ''),
-  RoutineProduct('Klairs 저자극 무향 토너', '토너', ''),
-  RoutineProduct('The Ordinary 나이아신아마이드 10%', '세럼', ''),
-  RoutineProduct('AAC 세이프 BHA 세럼', '세럼', 'AAC 추천'),
-  RoutineProduct('Anessa 퍼펙트 UV', '선크림', ''),
+  RoutineProduct('스노우 빙하수 에센스 토너', '토너', 'AAC 추천'),
+  RoutineProduct('제주 알로에 수딩젤', '수딩젤', ''),
+  RoutineProduct('자작나무 수분 로션', '로션', ''),
+  RoutineProduct('메노킨 선크림', '선크림', ''),
+  RoutineProduct('달바 화이트 트러플 엑소 인텐시브 세럼', '세럼', ''),
 ];
 
 const productCategories = <String>[
